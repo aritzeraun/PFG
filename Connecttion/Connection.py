@@ -2,6 +2,7 @@ import time
 
 import null as null
 import requests
+import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
@@ -11,17 +12,20 @@ from selenium.webdriver.support import expected_conditions as ec
 
 
 class Connections:
-
     URL = "http://wos.fecyt.es"
     URL_Deusto = ""
     driver = null
 
     def driverCreator(self):
 
+        ROOT_DIR = os.path.abspath(os.curdir)
+        ROOT_DIR = ROOT_DIR + '\Downloads'
         op = webdriver.ChromeOptions()
         # op.add_argument('--headless')
         op.add_argument('--start-maximized')
         op.add_argument('--disable-extensions')
+        prefs = {'download.default_directory': ROOT_DIR}
+        op.add_experimental_option('prefs', prefs)
 
         self.driver = webdriver.Chrome("C:\\Users\\eraun\\OneDrive\\Escritorio\\chromedriver.exe", options=op)
 
@@ -38,13 +42,14 @@ class Connections:
         self.driver.get(self.URL_Deusto)
         self.driver.find_element(By.NAME, 'username').send_keys(username)
 
-        self. driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select').click()
+        self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select').click()
         self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select/option[1]').click()
         self.driver.find_element(By.NAME, 'password').send_keys(password)
         self.driver.find_element(By.ID, 'regularsubmit').click()
 
         try:
-            WebDriverWait(self.driver, 5).until(ec.presence_of_element_located((By.XPATH, '//*[@id="content"]/div/p[1]/b')))
+            WebDriverWait(self.driver, 5).until(ec.presence_of_element_located(
+                (By.XPATH, '//*[@id="content"]/div/p[1]/b')))
             return 1
         except TimeoutException:
             print("todo correcto")
@@ -69,12 +74,15 @@ class Connections:
             (By.XPATH, '//*[@id="snSearchType"]/div[3]/button[2]'.replace(' ', '.')))).click()
 
         number_of_results = WebDriverWait(self.driver, 20).until(
-            ec.visibility_of_element_located((By.XPATH, "/html/body/app-wos/div/div/main/div/div[2]/app-input-route/app-base-summary-component/app-search-friendly-display/div[1]/app-general-search-friendly-display/h1/span"))).get_attribute("innerHTML")
+            ec.visibility_of_element_located((By.XPATH,
+                                              "/html/body/app-wos/div/div/main/div/div[2]/app-input-route/app-base-summary-component/app-search-friendly-display/div[1]/app-general-search-friendly-display/h1/span"))).get_attribute(
+            "innerHTML")
 
         number_of_results = number_of_results.replace(",", "")
-        number_of_results_rounded = int(int(number_of_results)/1000)
+        number_of_results_rounded = int(int(number_of_results) / 1000)
 
-        for i in range(0, number_of_results_rounded+1):
+        for i in range(0, number_of_results_rounded + 1):
+
             #  export data file
             WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
                 (By.XPATH, '//*[@id="snRecListTop"]/app-export-menu/div/button'.replace(' ', '.')))).click()
@@ -88,18 +96,74 @@ class Connections:
                                        self.driver.find_element(By.XPATH, '//*[@id="radio3-input"]'))
 
             # insercion de valor de limite inferior
+
+            position = 0 + (i * 2)
+            position = str(position)
+
             self.driver.execute_script("arguments[0].value='';",
-                                       self.driver.find_element(By.XPATH, '//*[@id="mat-input-0"]'))
+                                       self.driver.find_element(By.XPATH,
+                                                                '//*[@id="mat-input-!"]'.replace('!', position)))
 
             limite_inferior = int(1 + (1000 * i))
-            self.driver.find_element(By.XPATH, '//*[@id="mat-input-0"]').send_keys(limite_inferior)
+            self.driver.find_element(By.XPATH, '//*[@id="mat-input-!"]'.replace("!", position)).send_keys(
+                limite_inferior)
 
             # insercion de valor de limite superior
-            self.driver.execute_script("arguments[0].value='';",
-                                       self.driver.find_element(By.XPATH, '//*[@id="mat-input-1"]'))
 
-            limite_superior = 1000 * (1+i)
-            self.driver.find_element(By.XPATH, '//*[@id="mat-input-1"]').send_keys(limite_superior)
+            position = 1 + i * 2
+            position = str(position)
+
+            self.driver.execute_script("arguments[0].value='';",
+                                       self.driver.find_element(By.XPATH,
+                                                                '//*[@id="mat-input-!"]'.replace("!", position)))
+
+            if not i == number_of_results_rounded:
+                limite_superior = int(1000 * (1 + i))
+            else:
+                limite_superior = number_of_results
+
+            self.driver.find_element(By.XPATH, '//*[@id="mat-input-!"]'.replace("!", position)).send_keys(
+                limite_superior)
 
             WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
-                (By.XPATH, '/html/body/app-wos/div/div/main/div/div[2]/app-input-route[1]/app-export-overlay/div/div[3]/div[2]/app-export-out-details/div/div[2]/div/div[2]/button[1]'.replace(' ', '.')))).click()
+                (By.XPATH, '/html/body/app-wos/div/div/main/div/div[2]/app-input-route[1]/app-export-overlay/div/div[3]'
+                 + '/div[2]/app-export-out-details/div/div[2]/div/div[2]/button[1]'.replace(' ', '.')))).click()
+
+            time.sleep(5)
+
+            fileName = self.getDownLoadedFileName()
+            print(fileName)
+
+    # method to get the downloaded file name
+    def getDownLoadedFileName(self):
+
+        self.driver.execute_script("window.open()")
+
+        # switch to new tab
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+        # navigate to chrome downloads
+        oldDriver = self.driver
+        self.driver.get('chrome://downloads')
+        # define the endTime
+        endTime = time.time() + 10
+        while True:
+            try:
+                # get downloaded percentage
+                downloadPercentage = self.driver.execute_script(
+                    "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('#progress').value")
+                print(downloadPercentage)
+
+                # check if downloadPercentage is 100 (otherwise the script will keep waiting)
+                if downloadPercentage == 100:
+                    fileName = self.driver.execute_script(
+                        "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('div#content  #file-link').text")
+                    self.driver.close()
+                    self.driver.switch_to.window(self.driver.window_handles[0])
+                    self.driver = oldDriver
+                    # return the file name once the download is completed
+                    return fileName
+            except:
+                pass
+            time.sleep(1)
+            if time.time() > endTime:
+                break
