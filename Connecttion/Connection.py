@@ -43,20 +43,21 @@ class Connections:
         self.driver.find_element(By.NAME, 'username').send_keys(username)
 
         self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select').click()
-        self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select/option[1]').click()
+        user = str(user_tipology)
+        self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select/option[!]'
+                                 .replace("!", user)).click()
         self.driver.find_element(By.NAME, 'password').send_keys(password)
         self.driver.find_element(By.ID, 'regularsubmit').click()
 
         try:
-            WebDriverWait(self.driver, 5).until(ec.presence_of_element_located(
+            WebDriverWait(self.driver, 8).until(ec.presence_of_element_located(
                 (By.XPATH, '//*[@id="content"]/div/p[1]/b')))
-            return 1
+            self.driver.close()
+            return False
         except TimeoutException:
-            print("todo correcto")
-            return 0
+            return True
 
     def dataSearch(self, topic):
-
         self.driver.get(self.URL)
 
         WebDriverWait(self.driver, 15).until(
@@ -81,10 +82,13 @@ class Connections:
         number_of_results = number_of_results.replace(",", "")
         number_of_results_rounded = int(int(number_of_results) / 1000)
 
+        # array that contents downloaded files name
+        filesName = []
+
         for i in range(0, number_of_results_rounded + 1):
 
             #  export data file
-            WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
+            WebDriverWait(self.driver, 10).until(ec.element_to_be_clickable(
                 (By.XPATH, '//*[@id="snRecListTop"]/app-export-menu/div/button'.replace(' ', '.')))).click()
 
             WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
@@ -132,7 +136,10 @@ class Connections:
             time.sleep(5)
 
             fileName = self.getDownLoadedFileName()
-            print(fileName)
+            filesName.append(fileName)
+
+        self.driver.close()
+        return filesName
 
     # method to get the downloaded file name
     def getDownLoadedFileName(self):
@@ -149,19 +156,19 @@ class Connections:
         while True:
             try:
                 # get downloaded percentage
-                downloadPercentage = self.driver.execute_script(
-                    "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('#progress').value")
-                print(downloadPercentage)
+                #downloadPercentage = self.driver.execute_script(
+                 #   "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('#progress').value")
+                #print(downloadPercentage)
 
                 # check if downloadPercentage is 100 (otherwise the script will keep waiting)
-                if downloadPercentage == 100:
-                    fileName = self.driver.execute_script(
-                        "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('div#content  #file-link').text")
-                    self.driver.close()
-                    self.driver.switch_to.window(self.driver.window_handles[0])
-                    self.driver = oldDriver
-                    # return the file name once the download is completed
-                    return fileName
+                #if downloadPercentage == 100:
+                fileName = self.driver.execute_script(
+                    "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('div#content  #file-link').text")
+                self.driver.close()
+                self.driver.switch_to.window(self.driver.window_handles[0])
+                self.driver = oldDriver
+                # return the file name once the download is completed
+                return fileName
             except:
                 pass
             time.sleep(1)

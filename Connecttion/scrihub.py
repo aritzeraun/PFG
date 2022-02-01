@@ -49,7 +49,7 @@ class SciHub(object):
         urls = []
         # res = requests.get('https://sci-hub.now.sh/')
         # https://sci-hub.41610.org/
-        res = requests.get('https://sci-hub.41610.org/')
+        res = requests.get('https://sci-hub.41610.org')
         s = self._get_soup(res.content)
         for a in s.find_all('a', href=True):
             if 'sci-hub.' in a['href']:
@@ -248,7 +248,8 @@ class SciHub(object):
 class CaptchaNeedException(Exception):
     pass
 
-def main():
+
+def main(DOI):
     sh = SciHub()
 
     parser = argparse.ArgumentParser(description='SciHub - To remove all barriers in the way of science.')
@@ -272,13 +273,13 @@ def main():
     if args.proxy:
         sh.set_proxy(args.proxy)
 
-    if args.download:
-        result = sh.download(args.download, args.output)
-        if 'err' in result:
-            logger.debug('%s', result['err'])
-        else:
-            logger.debug('Successfully downloaded file with identifier %s', args.download)
-    elif args.search:
+    #if args.download:
+    result = sh.download(DOI, args.output)
+    if 'err' in result:
+        logger.debug('%s', result['err'])
+    else:
+        logger.debug('Successfully downloaded file with identifier %s', DOI)
+    if args.search:
         results = sh.search(args.search, args.limit)
         if 'err' in results:
             logger.debug('%s', results['err'])
@@ -306,7 +307,3 @@ def main():
                     logger.debug('%s', result['err'])
                 else:
                     logger.debug('Successfully downloaded file with identifier %s', identifier)
-
-
-if __name__ == '__main__':
-    main()
