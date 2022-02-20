@@ -1,25 +1,47 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+import null
+import configparser
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
+
+from Logic import SearchAction
 
 
 class Ui_Form(object):
-    def setupUi(self, Form):
+    def __init__(self):
+        self.connection = null
+        self.config = configparser.RawConfigParser()
+
+    def setupUi(self, Form, connection):
+
+        self.connection = connection
+        # open language configuration file
+        self.config.read('./Languages/AppConfigEN.cfg')
+
         Form.setObjectName("Form")
-        Form.resize(671, 470)
+        Form.setWindowModality(QtCore.Qt.WindowModal)
+        Form.resize(747, 569)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
+        Form.setSizePolicy(sizePolicy)
         self.layoutWidget = QtWidgets.QWidget(Form)
-        self.layoutWidget.setGeometry(QtCore.QRect(40, 120, 459, 71))
+        self.layoutWidget.setGeometry(QtCore.QRect(0, -10, 751, 581))
         self.layoutWidget.setObjectName("layoutWidget")
         self.formLayout = QtWidgets.QFormLayout(self.layoutWidget)
+        self.formLayout.setSizeConstraint(QtWidgets.QLayout.SetNoConstraint)
         self.formLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.FieldsStayAtSizeHint)
         self.formLayout.setRowWrapPolicy(QtWidgets.QFormLayout.DontWrapRows)
-        self.formLayout.setLabelAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+        self.formLayout.setLabelAlignment(QtCore.Qt.AlignCenter)
         self.formLayout.setFormAlignment(QtCore.Qt.AlignCenter)
         self.formLayout.setContentsMargins(0, 0, 0, 0)
+        self.formLayout.setHorizontalSpacing(0)
         self.formLayout.setObjectName("formLayout")
         self.lineEdit = QtWidgets.QLineEdit(self.layoutWidget)
         self.lineEdit.setMinimumSize(QtCore.QSize(350, 0))
         self.lineEdit.setMaximumSize(QtCore.QSize(400, 16777215))
         self.lineEdit.setObjectName("lineEdit")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.lineEdit)
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.lineEdit)
         self.comboBox = QtWidgets.QComboBox(self.layoutWidget)
         self.comboBox.setMinimumSize(QtCore.QSize(100, 0))
         self.comboBox.setMaximumSize(QtCore.QSize(200, 16777215))
@@ -28,31 +50,43 @@ class Ui_Form(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox)
-        self.frame = QtWidgets.QFrame(self.layoutWidget)
-        self.frame.setMinimumSize(QtCore.QSize(350, 40))
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.formLayoutWidget_2 = QtWidgets.QWidget(self.frame)
-        self.formLayoutWidget_2.setGeometry(QtCore.QRect(-1, -1, 351, 41))
-        self.formLayoutWidget_2.setObjectName("formLayoutWidget_2")
-        self.formLayout_2 = QtWidgets.QFormLayout(self.formLayoutWidget_2)
-        self.formLayout_2.setFormAlignment(QtCore.Qt.AlignCenter)
-        self.formLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.formLayout_2.setObjectName("formLayout_2")
-        self.pushButton = QtWidgets.QPushButton(self.formLayoutWidget_2)
+        self.pushButton = QtWidgets.QPushButton(self.layoutWidget)
         self.pushButton.setMaximumSize(QtCore.QSize(100, 16777215))
         self.pushButton.setObjectName("pushButton")
-        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.pushButton)
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.frame)
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.pushButton)
+        self.pushButton.clicked.connect(self.search_data)
 
+        print(12344)
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def thread_search_correctly(self):
+        msgBoxLogin = QMessageBox()
+        msgBoxLogin.setText('todo correcto')
+        msgBoxLogin.exec()
+
+    def thread_search_error(self):
+        msgBoxLogin = QMessageBox()
+        msgBoxLogin.setText('messageBox_alert_loginError_text')
+        msgBoxLogin.exec()
+
+    def search_data(self):
+        self.thread = SearchAction.SearchAction(self.connection, self.lineEdit.text())
+        self.thread.search_success.connect(self.thread_search_correctly)
+        self.thread.search_error.connect(self.thread_search_error)
+
+        self.thread.start()
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.comboBox.setItemText(0, _translate("Form", "Topic"))
-        self.comboBox.setItemText(1, _translate("Form", "Author"))
-        self.comboBox.setItemText(2, _translate("Form", "DOI"))
-        self.pushButton.setText(_translate("Form", "PushButton"))
+        self.lineEdit.setPlaceholderText(_translate("Form", self.config.get('SearchViewSection',
+                                                                            'search_topic_placeholder_text')))
+        self.comboBox.setItemText(0, _translate("Form", self.config.get('SearchViewSection',
+                                                                        'search_option_way_0')))
+        self.comboBox.setItemText(1, _translate("Form", self.config.get('SearchViewSection',
+                                                                        'search_option_way_1')))
+        self.comboBox.setItemText(2, _translate("Form", self.config.get('SearchViewSection',
+                                                                        'search_option_way_2')))
+        self.pushButton.setText(_translate("Form",self.config.get('SearchViewSection',
+                                                                  'searchButton_text')))

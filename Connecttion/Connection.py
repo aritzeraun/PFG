@@ -27,10 +27,9 @@ class Connections:
         prefs = {'download.default_directory': ROOT_DIR}
         op.add_experimental_option('prefs', prefs)
 
-        self.driver = webdriver.Chrome("C:\\Users\\eraun\\OneDrive\\Escritorio\\chromedriver.exe", options=op)
+        self.driver = webdriver.Chrome("./Driver/chromedriver.exe", options=op)
 
     def loginWebOfScience(self, username, password, user_tipology):
-
         data = requests.get(self.URL)
 
         soup = BeautifulSoup(data.content, 'html.parser')
@@ -41,7 +40,6 @@ class Connections:
 
         self.driver.get(self.URL_Deusto)
         self.driver.find_element(By.NAME, 'username').send_keys(username)
-
         self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select').click()
         user = str(user_tipology)
         self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select/option[!]'
@@ -50,7 +48,7 @@ class Connections:
         self.driver.find_element(By.ID, 'regularsubmit').click()
 
         try:
-            WebDriverWait(self.driver, 8).until(ec.presence_of_element_located(
+            WebDriverWait(self.driver, 3).until(ec.presence_of_element_located(
                 (By.XPATH, '//*[@id="content"]/div/p[1]/b')))
             self.driver.close()
             return False
@@ -63,27 +61,34 @@ class Connections:
         WebDriverWait(self.driver, 15).until(
             ec.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler'.replace(' ', '.')))).click()
 
-        self.driver.find_element(By.NAME, 'search-main-box').send_keys(topic)
+        self.driver.find_element(By.XPATH, '//*[@id="snSearchType"]/div[1]/app-search-row/div/div[2]/input')\
+            .send_keys(topic)
 
-        # select the data base of source
-        WebDriverWait(self.driver, 5).until(
-            ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button'.replace(' ', '.')))).click()
-        WebDriverWait(self.driver, 5).until(
-            ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button/span[1]'.replace(' ', '.')))).click()
+        try:
+            WebDriverWait(self.driver, 8).until(ec.presence_of_element_located(
+                (By.XPATH, '//*[@id="snSearchType"]/div[1]/b')))
+            print("todo ok")
+            return False
+        except TimeoutException:
+            # select the data base of source
+            WebDriverWait(self.driver, 5).until(
+                ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button'.replace(' ', '.')))).click()
+            WebDriverWait(self.driver, 5).until(
+                ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button/span[1]'.replace(' ', '.')))).click()
 
-        WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
-            (By.XPATH, '//*[@id="snSearchType"]/div[3]/button[2]'.replace(' ', '.')))).click()
+            WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
+                (By.XPATH, '//*[@id="snSearchType"]/div[3]/button[2]'.replace(' ', '.')))).click()
 
-        number_of_results = WebDriverWait(self.driver, 20).until(
-            ec.visibility_of_element_located((By.XPATH,
-                                              "/html/body/app-wos/div/div/main/div/div[2]/app-input-route/app-base-summary-component/app-search-friendly-display/div[1]/app-general-search-friendly-display/h1/span"))).get_attribute(
-            "innerHTML")
+            number_of_results = WebDriverWait(self.driver, 20).until(
+                ec.visibility_of_element_located((By.XPATH,
+                                                  "/html/body/app-wos/div/div/main/div/div[2]/app-input-route/app-base-summary-component/app-search-friendly-display/div[1]/app-general-search-friendly-display/h1/span"))).get_attribute(
+                "innerHTML")
 
-        number_of_results = number_of_results.replace(",", "")
-        number_of_results_rounded = int(int(number_of_results) / 1000)
+            number_of_results = number_of_results.replace(",", "")
+            number_of_results_rounded = int(int(number_of_results) / 1000)
 
-        # array that contents downloaded files name
-        filesName = []
+            # array that contents downloaded files name
+            filesName = []
 
         for i in range(0, number_of_results_rounded + 1):
 
