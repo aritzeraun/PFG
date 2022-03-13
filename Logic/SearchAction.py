@@ -20,3 +20,4 @@ class SearchAction(QThread):
             self.search_error.emit()
         else:
             self.search_success.emit()
+

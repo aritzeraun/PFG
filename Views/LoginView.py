@@ -4,13 +4,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QMessageBox
 from Logic import DomainLogic, LoginAction, ConfigWriter
-from Views import Search
+from Views import SearchView
 
 
 class Ui_MainWindow:
 
     def __init__(self):
-        self.GUI = Search.Ui_Form()
+        self.GUI = SearchView.Ui_Form()
         self.movie = QMovie("./GUI/process.gif")
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Languages/AppConfigGeneral.cfg')
@@ -18,9 +18,6 @@ class Ui_MainWindow:
         self.msgBoxDomain = QMessageBox()
         self.username = ""
         self.password = ""
-
-    def configValuesRed(self):
-        print(11)
 
     def setupUi(self, MainWindow):
         # open language configuration file
@@ -275,7 +272,7 @@ class Ui_MainWindow:
 
     def thread_authentication_correctly(self):
         searchView = QtWidgets.QWidget(self.centralwidget)
-        self.GUI.setupUi(searchView, self.thread.connection)
+        self.GUI.setupUi(searchView, self.thread.connection, self.centralwidget)
         self.widget.close()
         searchView.show()
 
