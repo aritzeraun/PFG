@@ -1,6 +1,8 @@
 import configparser
 import threading
+
 from PyQt5.QtCore import Qt
+
 from Connecttion import scrihub
 from PyQt5 import QtCore, QtGui, QtWidgets
 import Excel.ExcelFileTreatment
@@ -14,10 +16,13 @@ class Ui_Form(object):
         self.config = configparser.RawConfigParser()
         self.config.read('./Languages/AppConfig' + self.configGeneral.get('LANGUAGE', 'code') + '.cfg')
 
+        self.filesName = ""
+        self.estado_select = ""
+
     def setupUi(self, Form, filesName):
 
         self.filesName = filesName
-        self.estadoSeleccion = Qt.CheckState.Unchecked
+        self.estado_select = Qt.CheckState.Unchecked
 
         Form.setObjectName("Form")
         Form.setWindowModality(QtCore.Qt.WindowModal)
@@ -86,7 +91,7 @@ class Ui_Form(object):
 
         self.tableWidget.horizontalHeader().sectionPressed.connect(self.changeAllItemState)
         self.tableWidget.cellClicked.connect(self.changeItemState)
-        # self.downloadButton.click.connect(self.downloadAction)
+        self.downloadButton.clicked.connect(self.downloadAction)
         self.search_data()
 
     def changeAllItemState(self, index):
@@ -102,20 +107,20 @@ class Ui_Form(object):
 
         if index == 3:
 
-            if self.estadoSeleccion == Qt.CheckState.Unchecked or self.estadoSeleccion == Qt.CheckState.PartiallyChecked:
-                self.estadoSeleccion = Qt.CheckState.Checked
+            if self.estado_select == Qt.CheckState.Unchecked or self.estado_select == Qt.CheckState.PartiallyChecked:
+                self.estado_select = Qt.CheckState.Checked
                 icon.addPixmap(QtGui.QPixmap("./GUI/checked.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
                 item.setIcon(icon)
                 self.tableWidget.setHorizontalHeaderItem(3, item)
 
             else:
-                self.estadoSeleccion = Qt.CheckState.Unchecked
+                self.estado_select = Qt.CheckState.Unchecked
                 icon.addPixmap(QtGui.QPixmap("./GUI/unchecked.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
                 item.setIcon(icon)
                 self.tableWidget.setHorizontalHeaderItem(3, item)
 
         for i in range(0, number):
-            self.tableWidget.item(i, 3).setCheckState(self.estadoSeleccion)
+            self.tableWidget.item(i, 3).setCheckState(self.estado_select)
 
     def changeItemState(self, row, column):
 
@@ -140,32 +145,58 @@ class Ui_Form(object):
         item.setForeground(brush)
 
         if numberOfCoincidence == number:
-            self.estadoSeleccion = Qt.CheckState.Checked
+            self.estado_select = Qt.CheckState.Checked
             icon.addPixmap(QtGui.QPixmap("./GUI/checked.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             item.setIcon(icon)
             self.tableWidget.setHorizontalHeaderItem(3, item)
 
         elif number > numberOfCoincidence > 0:
-            self.estadoSeleccion = Qt.CheckState.PartiallyChecked
+            self.estado_select = Qt.CheckState.PartiallyChecked
             icon.addPixmap(QtGui.QPixmap("./GUI/intermediate.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             item.setIcon(icon)
             self.tableWidget.setHorizontalHeaderItem(3, item)
         elif numberOfCoincidence == 0:
-            self.estadoSeleccion = Qt.CheckState.Unchecked
+            self.estado_select = Qt.CheckState.Unchecked
             icon.addPixmap(QtGui.QPixmap("./GUI/unchecked.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             item.setIcon(icon)
             self.tableWidget.setHorizontalHeaderItem(3, item)
 
     def downloadAction(self):
-        # scihub_controller = scrihub.main()
-        print(1)
+
+        for rowNumber in range(0, self.tableWidget.rowCount()):
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignBottom)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap("./GUI/process.gif"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            item.setIcon(icon)
+
+            self.tableWidget.setItem(rowNumber, 4, item)
+
+        i = 0
+
+        for iterator in self.dataOfDocuments:
+            scihub_controller = scrihub.main(iterator.__getitem__(2))
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignBottom)
+            icon = QtGui.QIcon()
+
+            if 'err' in scihub_controller:
+                icon.addPixmap(QtGui.QPixmap("./GUI/incorrect.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            else:
+                icon.addPixmap(QtGui.QPixmap("./GUI/correct.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+
+            item.setIcon(icon)
+            self.tableWidget.setItem(i, 4, item)
+            i = i + 1
 
     def chargeData(self):
 
-        dataOfDocuments = Excel.ExcelFileTreatment.openFile(self.filesName)
-        self.tableWidget.setRowCount(len(dataOfDocuments))
+        self.dataOfDocuments = Excel.ExcelFileTreatment.openFile(self.filesName)
+        self.tableWidget.setRowCount(len(self.dataOfDocuments))
         rowNumber = 0
-        for iterator in dataOfDocuments:
+        for iterator in self.dataOfDocuments:
 
             self.tableWidget.setItem(rowNumber, 0, QtWidgets.QTableWidgetItem(iterator.__getitem__(0)))
             self.tableWidget.setItem(rowNumber, 1, QtWidgets.QTableWidgetItem(iterator.__getitem__(1)))
@@ -179,7 +210,7 @@ class Ui_Form(object):
             item = QtWidgets.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignBottom)
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap("./GUI/correct.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap("./GUI/incorrect.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             item.setIcon(icon)
             self.tableWidget.setItem(rowNumber, 4, item)
 
@@ -198,8 +229,8 @@ class Ui_Form(object):
         item.setText(_translate("Form", "Title"))
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("Form", "DOI"))
-        # item = self.tableWidget.horizontalHeaderItem(3)
-        # item.setText(_translate("Form", "Downloaded"))
+        item = self.tableWidget.horizontalHeaderItem(4)
+        item.setText(_translate("Form", "Downloaded"))
         self.downloadButton.setText(_translate("Form", str(self.config.get('ResultViewSection',
                                                                            'downloadButton_text')).encode('ansi')))
         self.toolButton.setText(_translate("Form", "..."))

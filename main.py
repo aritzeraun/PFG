@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from Views import LoginView
+from Views import LoginView, WelcomeView
 
 
 if __name__ == '__main__':
@@ -8,7 +8,7 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     MainWindow = QtWidgets.QMainWindow()
-    GUI = LoginView.Ui_MainWindow()
+    GUI = WelcomeView.WelcomeView(MainWindow)
     GUI.setupUi(MainWindow)
     MainWindow.show()
 

@@ -279,6 +279,9 @@ def main(DOI):
         logger.debug('%s', result['err'])
     else:
         logger.debug('Successfully downloaded file with identifier %s', DOI)
+
+    return result
+
     if args.search:
         results = sh.search(args.search, args.limit)
         if 'err' in results:
