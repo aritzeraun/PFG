@@ -12,7 +12,7 @@ class Ui_Form(object):
 
     def __init__(self):
         self.configGeneral = configparser.RawConfigParser()
-        self.configGeneral.read('./Languages/AppConfigGeneral.cfg')
+        self.configGeneral.read('./Languages/AppGeneralConfiguration.cfg')
         self.config = configparser.RawConfigParser()
         self.config.read('./Languages/AppConfig' + self.configGeneral.get('LANGUAGE', 'code') + '.cfg')
 

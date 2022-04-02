@@ -19,5 +19,5 @@ class ConfigWriter:
         }
 
         # Write the above sections to config.ini file
-        with open('./Languages/AppConfigGeneral.cfg', 'w') as conf:
+        with open('./Languages/AppGeneralConfiguration.cfg', 'w') as conf:
             self.config_object.write(conf)
