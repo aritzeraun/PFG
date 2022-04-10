@@ -1,0 +1,121 @@
+
+from PyQt5 import QtCore, QtWidgets
+from Views import LoginWidgetPanel
+import urllib.request
+
+
+def connectionToEthernet():
+
+    try:
+        urllib.request.urlopen('http://google.com')
+        return True
+    except:
+        return False
+
+
+class ApplicationView:
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(1216, 889)
+        self.centralWidget = QtWidgets.QWidget(MainWindow)
+        self.centralWidget.setObjectName("centralwidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.centralWidget)
+        self.gridLayout.setObjectName("gridLayout")
+        MainWindow.setCentralWidget(self.centralWidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setObjectName("menubar")
+        self.menuProject = QtWidgets.QMenu(self.menubar)
+        self.menuProject.setObjectName("menuProject")
+        self.menuOpen_Recent = QtWidgets.QMenu(self.menuProject)
+        self.menuOpen_Recent.setObjectName("menuOpen_Recent")
+        self.menuSettings = QtWidgets.QMenu(self.menubar)
+        self.menuSettings.setObjectName("menuSettings")
+        self.menuNvigation = QtWidgets.QMenu(self.menubar)
+        self.menuNvigation.setObjectName("menuNvigation")
+        self.menuProject_2 = QtWidgets.QMenu(self.menubar)
+        self.menuProject_2.setObjectName("menuProject_2")
+        self.menuHelp = QtWidgets.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
+        self.menuView = QtWidgets.QMenu(self.menubar)
+        self.menuView.setObjectName("menuView")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.actionNew_Project = QtWidgets.QAction(MainWindow)
+        self.actionNew_Project.setObjectName("actionNew_Project")
+        self.actionOpen = QtWidgets.QAction(MainWindow)
+        self.actionOpen.setObjectName("actionOpen")
+        self.actionProject_1 = QtWidgets.QAction(MainWindow)
+        self.actionProject_1.setObjectName("actionProject_1")
+        self.actionProject_2 = QtWidgets.QAction(MainWindow)
+        self.actionProject_2.setObjectName("actionProject_2")
+        self.actionProject_3 = QtWidgets.QAction(MainWindow)
+        self.actionProject_3.setObjectName("actionProject_3")
+        self.actionProyect_4 = QtWidgets.QAction(MainWindow)
+        self.actionProyect_4.setObjectName("actionProyect_4")
+        self.actionProyect_5 = QtWidgets.QAction(MainWindow)
+        self.actionProyect_5.setObjectName("actionProyect_5")
+        self.actionExit = QtWidgets.QAction(MainWindow)
+        self.actionExit.setObjectName("actionExit")
+        self.actionLanguage = QtWidgets.QAction(MainWindow)
+        self.actionLanguage.setObjectName("actionLanguage")
+        self.actionLicense = QtWidgets.QAction(MainWindow)
+        self.actionLicense.setObjectName("actionLicense")
+        self.actionProgressView = QtWidgets.QAction(MainWindow)
+        self.actionProgressView.setCheckable(True)
+        self.actionProgressView.setChecked(True)
+        self.actionProgressView.setObjectName("actionProgressView")
+        self.menuOpen_Recent.addSeparator()
+        self.menuOpen_Recent.addAction(self.actionProject_1)
+        self.menuOpen_Recent.addAction(self.actionProject_2)
+        self.menuOpen_Recent.addAction(self.actionProject_3)
+        self.menuOpen_Recent.addAction(self.actionProyect_4)
+        self.menuOpen_Recent.addAction(self.actionProyect_5)
+        self.menuProject.addAction(self.actionNew_Project)
+        self.menuProject.addAction(self.actionOpen)
+        self.menuProject.addAction(self.menuOpen_Recent.menuAction())
+        self.menuProject.addSeparator()
+        self.menuProject.addAction(self.actionExit)
+        self.menuSettings.addAction(self.actionLanguage)
+        self.menuSettings.addAction(self.actionLicense)
+        self.menuView.addAction(self.actionProgressView)
+        self.menubar.addAction(self.menuProject.menuAction())
+        self.menubar.addAction(self.menuProject_2.menuAction())
+        self.menubar.addAction(self.menuNvigation.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
+        self.menubar.addAction(self.menuSettings.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
+
+        thereIsInternetConnection = connectionToEthernet()
+
+        if thereIsInternetConnection:
+            LicenseView = QtWidgets.QWidget(self.centralWidget)
+            controller = LoginWidgetPanel.LoginWidgetPanel(LicenseView)
+            self.gridLayout.addWidget(LicenseView)
+
+        self.translateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def translateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.menuProject.setTitle(_translate("MainWindow", "File"))
+        self.menuOpen_Recent.setTitle(_translate("MainWindow", "Open Recent"))
+        self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
+        self.menuNvigation.setTitle(_translate("MainWindow", "Navigation"))
+        self.menuProject_2.setTitle(_translate("MainWindow", "Project"))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help"))
+        self.menuView.setTitle(_translate("MainWindow", "View"))
+        self.actionNew_Project.setText(_translate("MainWindow", "New Project"))
+        self.actionOpen.setText(_translate("MainWindow", "Open..."))
+        self.actionProject_1.setText(_translate("MainWindow", "Project 1"))
+        self.actionProject_2.setText(_translate("MainWindow", "Project 2"))
+        self.actionProject_3.setText(_translate("MainWindow", "Project 3"))
+        self.actionProyect_4.setText(_translate("MainWindow", "Proyect 4"))
+        self.actionProyect_5.setText(_translate("MainWindow", "Proyect 5"))
+        self.actionExit.setText(_translate("MainWindow", "Exit"))
+        self.actionLanguage.setText(_translate("MainWindow", "Language"))
+        self.actionLicense.setText(_translate("MainWindow", "License"))
+        self.actionProgressView.setText(_translate("MainWindow", "ProgressView"))
