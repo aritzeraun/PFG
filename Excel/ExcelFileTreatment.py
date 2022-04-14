@@ -1,15 +1,13 @@
-import os
 # RECORDAR QUE AL PINCIPIO SE QUISO UTILIZAR OPENPYXL PERO ESTE NO ESA HABILITADO PARA LOS XML
 import pandas as pd
 
 
-def openFile(nombreArchivo):
+def openFile(files):
 
     array = []
+    print(files)
+    for ROOT_DIR in files:
 
-    for iterator in nombreArchivo:
-        ROOT_DIR = os.path.abspath(os.curdir)
-        ROOT_DIR = ROOT_DIR + '\Downloads\ '.replace(' ', '') + iterator
         group = pd.ExcelFile(ROOT_DIR)
         sheetX = group.parse(0)  # 2 is the sheet number+1 thus if the file has only 1 sheet write 0 in paranthesis
 

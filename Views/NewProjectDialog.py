@@ -18,9 +18,14 @@ class NewProjectDialog(object):
         self.cancelPushButton = QtWidgets.QPushButton(self.widget)
 
         self.configGeneral = configparser.RawConfigParser()
-        self.configGeneral.read('./Languages/AppGeneralConfiguration.cfg')
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
         self.config = configparser.RawConfigParser()
-        self.config.read('./Languages/AppConfig' + self.configGeneral.get('LANGUAGE', 'code') + '.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
+
+        self.font = self.configGeneral.get('SYSTEM', 'accessibility_current_font')
+        self.fontSize = int(self.configGeneral.get('SYSTEM', 'accessibility_current_font_size'))
+        self.mainColor = self.configGeneral.get('SYSTEM', 'theme_current_main_color')
+        self.secondaryColor = self.configGeneral.get('SYSTEM', 'theme_current_secondary_color')
 
         self.folder = None
         self.newProjectName = None
@@ -46,19 +51,19 @@ class NewProjectDialog(object):
         self.gridLayout.setObjectName("gridLayout")
         self.folderInputLine.setMinimumSize(QtCore.QSize(400, 0))
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
+        font.setFamily(self.font)
         font.setBold(False)
         font.setWeight(50)
         self.folderInputLine.setFont(font)
         self.folderInputLine.setStyleSheet("QLineEdit {\n"
-                                           "    border: 2px solid rgb(59, 91, 134);\n"
+                                           "    border: 2px solid rgb" + self.secondaryColor + ";\n"
                                            "    border-radius: 10px;\n"
                                            "    background-color: rgb(255, 255, 255);\n"
                                            "    padding-left: 10px;\n"
                                            "    padding-right: 10px;\n"
                                            "}\n"
                                            "QLineEdit:hover {\n"
-                                           "    border: 2px solid rgb(32, 111, 209);\n"
+                                           "    border: 2px solid rgb" + self.mainColor + ";\n"
                                            "}")
         self.folderInputLine.setReadOnly(True)
         self.folderInputLine.setClearButtonEnabled(False)
@@ -71,7 +76,7 @@ class NewProjectDialog(object):
         self.directoryAccessButton.setStyleSheet("QPushButton{\n"
                                                  "    border: 0px solid;\n"
                                                  "    border-radius: 2px;\n"
-                                                 "    background-color: rgb(59, 91, 134);\n"
+                                                 "    background-color: rgb" + self.secondaryColor + ";\n"
                                                  "    padding-right:0px;\n"
                                                  "    padding-left: 0px;\n"
                                                  "}")
@@ -82,17 +87,17 @@ class NewProjectDialog(object):
         self.directoryAccessButton.setObjectName("directoryAccessButton")
         self.gridLayout.addWidget(self.directoryAccessButton, 2, 1, 1, 1)
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
+        font.setFamily(self.font)
         self.projectNameInputLine.setFont(font)
         self.projectNameInputLine.setStyleSheet("QLineEdit {\n"
-                                                "    border: 2px solid rgb(59, 91, 134);\n"
+                                                "    border: 2px solid rgb" + self.secondaryColor + ";\n"
                                                 "    border-radius: 10px;\n"
                                                 "    background-color: rgb(255, 255, 255);\n"
                                                 "    padding-left: 10px;\n"
                                                 "    padding-right: 10px;\n"
                                                 "}\n"
                                                 "QLineEdit:hover {\n"
-                                                "    border: 2px solid rgb(32, 111, 209);\n"
+                                                "    border: 2px solid rgb" + self.mainColor + ";\n"
                                                 "}")
         self.projectNameInputLine.setObjectName("locationInput")
         self.gridLayout.addWidget(self.projectNameInputLine, 1, 0, 1, 1)
@@ -104,37 +109,37 @@ class NewProjectDialog(object):
         self.createPushButton.setMinimumSize(QtCore.QSize(150, 25))
         self.createPushButton.setMaximumSize(QtCore.QSize(150, 25))
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        font.setPointSize(9)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize + 1))
         self.createPushButton.setFont(font)
         self.createPushButton.setStyleSheet("QPushButton {\n"
-                                            "    border: 2px solid rgb(59, 91, 134);\n"
+                                            "    border: 2px solid rgb" + self.secondaryColor + ";\n"
                                             "    border-radius: 10px;\n"
-                                            "    background-color: rgb(59, 91, 134);\n"
+                                            "    background-color: rgb" + self.secondaryColor + ";\n"
                                             "    padding-left: 10px;\n"
                                             "    padding-right: 10px;\n"
                                             "}\n"
                                             "QPushButton:hover {\n"
-                                            "    border: 2px solid rgb(32, 111, 209);\n"
-                                            "    background-color: rgb(32, 111, 209);\n"
+                                            "    border: 2px solid rgb" + self.mainColor + ";\n"
+                                            "    background-color: rgb" + self.mainColor + ";\n"
                                             "}")
         self.createPushButton.setObjectName("cancelPushButton")
         self.horizontalLayout.addWidget(self.createPushButton)
         self.cancelPushButton.setMinimumSize(QtCore.QSize(150, 25))
         self.cancelPushButton.setMaximumSize(QtCore.QSize(150, 25))
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        font.setPointSize(9)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize + 1))
         self.cancelPushButton.setFont(font)
         self.cancelPushButton.setStyleSheet("QPushButton {\n"
-                                            "    border: 2px solid rgb(59, 91, 134);\n"
+                                            "    border: 2px solid rgb" + self.secondaryColor + ";\n"
                                             "    border-radius: 10px;\n"
                                             "    background-color: rgb(255, 255, 255);\n"
                                             "    padding-left: 10px;\n"
                                             "    padding-right: 10px;\n"
                                             "}\n"
                                             "QPushButton:hover {\n"
-                                            "    border: 2px solid rgb(32, 111, 209);\n"
+                                            "    border: 2px solid rgb" + self.mainColor + ";\n"
                                             "}")
         self.cancelPushButton.setObjectName("createPushButton")
         self.horizontalLayout.addWidget(self.cancelPushButton)
@@ -145,8 +150,8 @@ class NewProjectDialog(object):
         self.errorMessageLabel.setObjectName("errorMessageLabel")
         self.errorMessageLabel.setStyleSheet("color: rgb(255, 0, 0);")
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        font.setPointSize(8)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
         self.createPushButton.setFont(font)
         self.errorMessageLabel.setFont(font)
         self.gridLayout.addWidget(self.errorMessageLabel, 3, 0, 1, 1)
@@ -154,12 +159,12 @@ class NewProjectDialog(object):
         self.specificationMessageLabel.setObjectName("specificationMessageLabel")
         self.specificationMessageLabel.setStyleSheet("color: rgb(255, 0, 0);")
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        font.setPointSize(8)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
         self.specificationMessageLabel.setFont(font)
         self.gridLayout.addWidget(self.specificationMessageLabel, 4, 0, 1, 1)
 
-        self.retranslateUi(Dialog)
+        self.translateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
         self.directoryAccessButton.clicked.connect(lambda: self.openNewProjectDirectory())
@@ -214,7 +219,7 @@ class NewProjectDialog(object):
         self.folder = folder
         self.folderInputLine.setText(str(folder))
 
-    def retranslateUi(self, Dialog):
+    def translateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", str(self.config.get('NewProjectDialogSection', 'window_title_text'))
                                          .encode('ansi')))

@@ -9,8 +9,10 @@ from Logic import ConfigurationFileWriter
 
 class CustomiseWidgetPanel(object):
 
-    def __init__(self, Form):
+    def __init__(self, Form, central, MainWindow):
 
+        self.MainWindow = MainWindow
+        self.central = central
         self.Form = Form
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.mainWidget = QtWidgets.QGridLayout()
@@ -35,6 +37,10 @@ class CustomiseWidgetPanel(object):
 
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config = configparser.RawConfigParser()
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
+
+        self.secondaryColor = self.configGeneral.get('SYSTEM', 'theme_current_secondary_color')
         self.mainColor = self.configGeneral.get('SYSTEM', 'theme_current_main_color').replace('(', '')
         self.mainColor = self.mainColor.replace(')', '')
         self.mainColor = self.mainColor.split(',')
@@ -49,8 +55,9 @@ class CustomiseWidgetPanel(object):
         color_2 = '#44' + color.replace('#', '')
         self.accessibilityToggle = AnimatedToggle(checked_color=str(color), pulse_checked_color=str(color_2))
         self.themeToggle = AnimatedToggle(checked_color=str(color), pulse_checked_color=str(color_2))
-
+        self.state = 'init'
         self.font = self.configGeneral.get('SYSTEM', 'accessibility_current_font')
+        self.fontSize = int(self.configGeneral.get('SYSTEM', 'accessibility_current_font_size'))
         self.setupUi(Form)
 
     def setupUi(self, Form):
@@ -72,7 +79,7 @@ class CustomiseWidgetPanel(object):
         self.mainWidget.addWidget(self.secondaryColorButton, 14, 2, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
-        font.setPointSize(9)
+        font.setPointSize(int(self.fontSize + 1))
         font.setBold(True)
         font.setWeight(75)
         self.languageLabel.setFont(font)
@@ -81,7 +88,7 @@ class CustomiseWidgetPanel(object):
         self.mainWidget.addWidget(self.languageLabel, 1, 0, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
-        font.setPointSize(8)
+        font.setPointSize(int(self.fontSize))
         self.secondaryColorLabel.setFont(font)
         self.secondaryColorLabel.setObjectName("secondaryColorLabel")
         self.mainWidget.addWidget(self.secondaryColorLabel, 14, 0, 1, 1)
@@ -96,7 +103,7 @@ class CustomiseWidgetPanel(object):
         self.mainWidget.addItem(spacerItem1, 6, 3, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
-        font.setPointSize(9)
+        font.setPointSize(int(self.fontSize + 1))
         font.setBold(True)
         font.setWeight(75)
         self.accessibilityLabel.setFont(font)
@@ -165,7 +172,7 @@ class CustomiseWidgetPanel(object):
         self.mainWidget.addWidget(self.fontSizeBox, 7, 2, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
-        font.setPointSize(9)
+        font.setPointSize(int(self.fontSize + 1))
         font.setBold(True)
         font.setWeight(75)
         self.themeLabel.setFont(font)
@@ -191,31 +198,33 @@ class CustomiseWidgetPanel(object):
         self.mainWidget.addWidget(self.defaultAccessibilityLabel, 4, 0, 1, 1)
         self.gridLayout.addLayout(self.mainWidget, 0, 0, 1, 1)
 
+        self.translateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.adaptViewToConfigurationSetting()
+
+        # here are defined the functions of the widgets added
         self.mainColorButton.clicked.connect(lambda: self.selectMainColor('Main'))
         self.secondaryColorButton.clicked.connect(lambda: self.selectMainColor('Secondary'))
         self.accessibilityToggle.clicked.connect(lambda: self.setWidgetsEnable('A_changes'))
         self.themeToggle.clicked.connect(lambda: self.setWidgetsEnable('T_changes'))
-        self.secondaryColorButton.objectNameChanged.connect(lambda: self.configChanges())
-        self.mainColorButton.objectNameChanged.connect(lambda: self.configChanges())
-        self.fontSizeBox.valueChanged.connect(lambda: self.configChanges())
-        self.fontComboBox.currentIndexChanged.connect(lambda: self.configChanges())
-        self.styleBox.currentIndexChanged.connect(lambda: self.configChanges())
-        self.languagesComboBox.currentIndexChanged.connect(lambda: self.configChanges())
+        self.secondaryColorButton.clicked.connect(lambda: self.configChanges())
+        self.mainColorButton.clicked.connect(lambda: self.configChanges())
+        self.fontSizeBox.editingFinished.connect(lambda: self.configChanges())
+        self.fontComboBox.activated.connect(lambda: self.configChanges())
+        self.styleBox.activated.connect(lambda: self.configChanges())
+        self.languagesComboBox.activated.connect(lambda: self.configChanges())
 
+        # Toggle definitions
         self.themeToggle.setMaximumSize(QtCore.QSize(80, 16777215))
         self.mainWidget.addWidget(self.themeToggle, 10, 2, 1, 1)
         self.accessibilityToggle.setMaximumSize(QtCore.QSize(80, 16777215))
         self.mainWidget.addWidget(self.accessibilityToggle, 4, 2, 1, 1)
 
-        self.translateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
-
+        # Defines TAB position between different widgets
         Form.setTabOrder(self.languagesComboBox, self.fontComboBox)
         Form.setTabOrder(self.fontComboBox, self.styleBox)
         Form.setTabOrder(self.styleBox, self.mainColorButton)
         Form.setTabOrder(self.mainColorButton, self.secondaryColorButton)
-
-        self.adaptViewToConfigurationSetting()
 
     def selectMainColor(self, selectedButton):
         color = QColorDialog.getColor()
@@ -309,29 +318,85 @@ class CustomiseWidgetPanel(object):
 
     def configChanges(self):
 
-        configFileWriter = ConfigurationFileWriter.ConfigWriter()
+        configFileWriter = ConfigurationFileWriter.ConfigurationFileWriter()
 
         configFileWriter.configFileWriter(self.languagesComboBox.currentText(), self.accessibilityToggle.isChecked(),
                                           self.fontComboBox.currentText(), self.fontSizeBox.text(),
                                           self.themeToggle.isChecked(), self.styleBox.currentText(),
                                           self.mainColorButton.objectName(), self.secondaryColorButton.objectName())
+        print(11)
+        if self.state != 'init':
+
+            CustomiseView = QtWidgets.QWidget(self.central)
+            self.MainWindow.horizontalLayout.addWidget(CustomiseView)
+            customiseViewController = CustomiseWidgetPanel(CustomiseView, self.central, self.MainWindow)
+            self.MainWindow.sectionViews.close()
+            self.MainWindow.sectionViews = customiseViewController.Form
+
+            # changes y de Option Column of Welcome View
+
+            self.MainWindow.projectOptionButton.setStyleSheet("background-color: rgb" +
+                                                              self.secondaryColorButton.objectName() +
+                                                              "; border: none;")
+            self.MainWindow.customiseOptionButton.setStyleSheet("background-color: rgb" +
+                                                                self.mainColorButton.objectName() + "; border: none;")
+            self.MainWindow.licenseOptionButton.setStyleSheet("background-color: rgb" +
+                                                              self.secondaryColorButton.objectName() +
+                                                              "; border: none;")
+            self.MainWindow.optionsWidget.setStyleSheet("background-color: rgb" +
+                                                        self.secondaryColorButton.objectName() + "; border: none;")
+
+            # font changes
+
+            font = QtGui.QFont()
+            font.setFamily(self.fontComboBox.currentText())
+            font.setPointSize(int(int(self.fontSizeBox.text()) + 1))
+            self.MainWindow.projectOptionButton.setFont(font)
+            self.MainWindow.customiseOptionButton.setFont(font)
+            self.MainWindow.licenseOptionButton.setFont(font)
+
+        self.state = 'second'
 
     def translateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.languageLabel.setText(_translate("Form", "Language:"))
-        self.secondaryColorLabel.setText(_translate("Form", "        Secondary Color:"))
-        self.mainColorLabel.setText(_translate("Form", "        Main Color:"))
-        self.accessibilityLabel.setText(_translate("Form", "Accessibility:"))
-        self.fontSizeLabel.setText(_translate("Form", "        Font Size: "))
-        self.fontLabel.setText(_translate("Form", "        Font: "))
-        self.styleLabel.setText(_translate("Form", "        Style:"))
-        self.styleBox.setItemText(0, _translate("Form", "Fusion"))
-        self.styleBox.setItemText(1, _translate("Form", "Windows Vista"))
-        self.styleBox.setItemText(2, _translate("Form", "Windows"))
-        self.languagesComboBox.setItemText(0, _translate("Form", "EN"))
-        self.languagesComboBox.setItemText(1, _translate("Form", "ES"))
-        self.languagesComboBox.setItemText(2, _translate("Form", "EUS"))
-        self.themeLabel.setText(_translate("Form", "Theme:"))
-        self.defaultThemeLabel.setText(_translate("Form", "        Default:"))
-        self.defaultAccessibilityLabel.setText(_translate("Form", "        Default:"))
+        self.languageLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                          'language_label_text')).encode('ansi')))
+        self.secondaryColorLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                                'secondary_color_label_text'))
+                                                    .encode('ansi')))
+        self.mainColorLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                           'main_color_label_text')).encode('ansi')))
+        self.accessibilityLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                               'accessibility_label_text'))
+                                                   .encode('ansi')))
+        self.fontSizeLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                          'font_size_label_text')).encode('ansi')))
+        self.fontLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                      'font_label_text')).encode('ansi')))
+        self.styleLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                       'style_label_text')).encode('ansi')))
+        self.styleBox.setItemText(0, _translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                            'style_box_option_1')).encode('ansi')))
+        self.styleBox.setItemText(1, _translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                            'style_box_option_2')).encode('ansi')))
+        self.styleBox.setItemText(2, _translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                            'style_box_option_3')).encode('ansi')))
+        self.languagesComboBox.setItemText(0, _translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                                     'language_box_option_1'))
+                                                         .encode('ansi')))
+        self.languagesComboBox.setItemText(1, _translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                                     'language_box_option_2'))
+                                                         .encode('ansi')))
+        self.languagesComboBox.setItemText(2, _translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                                     'language_box_option_3'))
+                                                         .encode('ansi')))
+        self.themeLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                       'theme_label_text')).encode('ansi')))
+        self.defaultThemeLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',
+                                                                              'theme_default_toggle_text'))
+                                                  .encode('ansi')))
+        self.defaultAccessibilityLabel.setText(_translate("Form",
+                                                          str(self.config.get('CustomiseWidgetPanelSection',
+                                                                              'accessibility_default_toggle_text'))
+                                                          .encode('ansi')))

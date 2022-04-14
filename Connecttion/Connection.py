@@ -26,10 +26,9 @@ class Connections:
         op.add_argument('--disable-extensions')
         prefs = {'download.default_directory': ROOT_DIR}
         op.add_experimental_option('prefs', prefs)
-
         self.driver = webdriver.Chrome("./Driver/chromedriver.exe", options=op)
 
-    def loginWebOfScience(self, username, password, user_tipology):
+    def loginWebOfScience(self, username, password, user_typology):
         data = requests.get(self.URL)
 
         soup = BeautifulSoup(data.content, 'html.parser')
@@ -37,11 +36,10 @@ class Connections:
         for i in e:
             if "Universidad de Deusto" in i.text:
                 self.URL_Deusto = i.get('value')
-
         self.driver.get(self.URL_Deusto)
         self.driver.find_element(By.NAME, 'username').send_keys(username)
         self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select').click()
-        user = str(user_tipology)
+        user = str(user_typology)
         self.driver.find_element(By.XPATH, '//*[@id="content"]/form/table/tbody/tr[1]/td[4]/select/option[!]'
                                  .replace("!", user)).click()
         self.driver.find_element(By.NAME, 'password').send_keys(password)
@@ -61,8 +59,7 @@ class Connections:
         WebDriverWait(self.driver, 15).until(
             ec.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler'.replace(' ', '.')))).click()
 
-        self.driver.find_element(By.XPATH, '//*[@id="snSearchType"]/div[1]/app-search-row/div/div[2]/input')\
-            .send_keys(topic)
+        self.driver.find_element(By.XPATH, '//*[@id="mat-input-0"]').send_keys(topic)
 
         try:
             WebDriverWait(self.driver, 8).until(ec.presence_of_element_located(
@@ -106,7 +103,7 @@ class Connections:
 
             # insercion de valor de limite inferior
 
-            position = 0 + (i * 2)
+            position = 1 + (i * 2)
             position = str(position)
 
             self.driver.execute_script("arguments[0].value='';",
@@ -119,7 +116,7 @@ class Connections:
 
             # insercion de valor de limite superior
 
-            position = 1 + i * 2
+            position = 2 + i * 2
             position = str(position)
 
             self.driver.execute_script("arguments[0].value='';",
@@ -131,12 +128,10 @@ class Connections:
             else:
                 limite_superior = number_of_results
 
-            self.driver.find_element(By.XPATH, '//*[@id="mat-input-!"]'.replace("!", position)).send_keys(
-                limite_superior)
+            self.driver.find_element(By.XPATH, '//*[@id="mat-input-!"]'.replace("!", position)).send_keys(limite_superior)
 
             WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
-                (By.XPATH, '/html/body/app-wos/div/div/main/div/div[2]/app-input-route[1]/app-export-overlay/div/div[3]'
-                 + '/div[2]/app-export-out-details/div/div[2]/div/div[2]/button[1]'.replace(' ', '.')))).click()
+                (By.XPATH, '//html/body/app-wos/div/div/main/div/div[2]/app-input-route[1]/app-export-overlay/div/div[3]/div[2]/app-export-out-details/div/div[2]/form/div/div[2]/button[1]'.replace(' ', '.')))).click()
 
             time.sleep(5)
 
@@ -160,13 +155,7 @@ class Connections:
         endTime = time.time() + 10
         while True:
             try:
-                # get downloaded percentage
-                #downloadPercentage = self.driver.execute_script(
-                 #   "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('#progress').value")
-                #print(downloadPercentage)
 
-                # check if downloadPercentage is 100 (otherwise the script will keep waiting)
-                #if downloadPercentage == 100:
                 fileName = self.driver.execute_script(
                     "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList downloads-item').shadowRoot.querySelector('div#content  #file-link').text")
                 self.driver.close()

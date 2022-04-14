@@ -4,20 +4,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QMessageBox
 from Logic import DomainLogic, LoginAction, ConfigurationFileWriter
-from Views import SearchView
+from Views import SearchWidgetPanel
 
 
 class LoginWidgetPanel(object):
 
-    def __init__(self, Form, CentralWidget):
+    def __init__(self, Form, CentralWidget, MainWindow):
 
         self.Form = Form
+        self.MainWindow = MainWindow
         self.centralWidget = CentralWidget
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.widget = QtWidgets.QWidget(Form)
         self.gridLayout_2 = QtWidgets.QGridLayout(self.widget)
-        self.widget_2 = QtWidgets.QWidget(self.widget)
-        self.accessButton = QtWidgets.QPushButton(self.widget_2)
+        self.buttonWidget = QtWidgets.QWidget(self.widget)
+        self.accessButton = QtWidgets.QPushButton(self.buttonWidget)
         self.checkBox = QtWidgets.QCheckBox(self.widget)
         self.loadBox = QtWidgets.QLabel(self.widget)
         self.passwordField = QtWidgets.QLineEdit(self.widget)
@@ -70,11 +71,11 @@ class LoginWidgetPanel(object):
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.widget_2.sizePolicy().hasHeightForWidth())
-        self.widget_2.setSizePolicy(sizePolicy)
-        self.widget_2.setMinimumSize(QtCore.QSize(400, 40))
-        self.widget_2.setMaximumSize(QtCore.QSize(400, 40))
-        self.widget_2.setObjectName("widget_2")
+        sizePolicy.setHeightForWidth(self.buttonWidget.sizePolicy().hasHeightForWidth())
+        self.buttonWidget.setSizePolicy(sizePolicy)
+        self.buttonWidget.setMinimumSize(QtCore.QSize(400, 40))
+        self.buttonWidget.setMaximumSize(QtCore.QSize(400, 40))
+        self.buttonWidget.setObjectName("widget_2")
         self.accessButton.setGeometry(QtCore.QRect(130, 10, 111, 28))
         self.accessButton.setAutoFillBackground(False)
         self.accessButton.setStyleSheet("QPushButton {\n"
@@ -88,7 +89,7 @@ class LoginWidgetPanel(object):
                                         "background-color: rgb" + self.mainColor + ";\n"
                                         "}")
         self.accessButton.setObjectName("accessButton")
-        self.gridLayout_2.addWidget(self.widget_2, 7, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.buttonWidget, 7, 0, 1, 1)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_2.addItem(spacerItem, 1, 0, 1, 1)
         self.checkBox.setMinimumSize(QtCore.QSize(200, 0))
@@ -107,8 +108,13 @@ class LoginWidgetPanel(object):
         self.loadBox.setMinimumSize(QtCore.QSize(400, 100))
         self.loadBox.setMaximumSize(QtCore.QSize(400, 100))
         self.loadBox.setLayoutDirection(QtCore.Qt.LeftToRight)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.loadBox.setFont(font)
+        self.loadBox.setPixmap(QtGui.QPixmap('./Resources/img/recent_projects_icon.png'))
         self.loadBox.setText("")
-        self.loadBox.setAlignment(QtCore.Qt.AlignCenter)
+        self.loadBox.setAlignment(QtCore.Qt.AlignJustify)
         self.loadBox.setWordWrap(True)
         self.loadBox.setOpenExternalLinks(True)
         self.loadBox.setObjectName("loadBox")
@@ -186,11 +192,12 @@ class LoginWidgetPanel(object):
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
 
         # define user possible actions
-        self.accessButton.clicked.connect(self.accessButton_clicked_or_returnPressed)
-        self.passwordField.returnPressed.connect(self.accessButton_clicked_or_returnPressed)
-        self.checkBox.stateChanged.connect(self.configChanges)
+        self.accessButton.clicked.connect(lambda: self.accessButton_clicked_or_returnPressed())
+        self.passwordField.returnPressed.connect(lambda: self.accessButton_clicked_or_returnPressed())
+        self.checkBox.stateChanged.connect(lambda: self.configChanges())
 
         # create load animation widget
+        self.loadBox.setText(self.config.get('LoginWidgetPanelSection', 'load_box_initial_text'))
         self.movie.start()
 
         # create error message box
@@ -212,13 +219,15 @@ class LoginWidgetPanel(object):
 
     def thread_authentication_correctly(self):
         searchView = QtWidgets.QWidget(self.centralWidget)
-        SearchController = SearchView.SearchWidgetPanel()
-        SearchController.setupUi(searchView, self.thread.connection, self.centralWidget)
-        self.widget.close()
+        cont = SearchWidgetPanel.SearchWidgetPanel(searchView, self.thread.connection, self.centralWidget,
+                                                   self.MainWindow)
+        self.MainWindow.gridLayout.addWidget(cont.Form)
         searchView.show()
+        self.Form.close()
 
     def thread_authentication_error(self):
         self.loadBox.clear()
+        self.loadBox.setAlignment(QtCore.Qt.AlignJustify)
         self.usernameField.setEnabled(True)
         self.passwordField.setEnabled(True)
         self.accessButton.setEnabled(True)
@@ -230,6 +239,7 @@ class LoginWidgetPanel(object):
     def loadViewThread(self):
         # change login view
         self.loadBox.clear()
+        self.loadBox.setAlignment(QtCore.Qt.AlignCenter)
         self.loadBox.setMovie(self.movie)
         self.usernameField.setEnabled(False)
         self.passwordField.setEnabled(False)

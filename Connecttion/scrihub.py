@@ -30,6 +30,7 @@ urllib3.disable_warnings()
 SCHOLARS_BASE_URL = 'https://scholar.google.com/scholar'
 HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:27.0) Gecko/20100101 Firefox/27.0'}
 
+
 class SciHub(object):
     """
     SciHub class can search for papers on Google Scholars
@@ -245,11 +246,12 @@ class SciHub(object):
         pdf_hash = hashlib.md5(res.content).hexdigest()
         return '%s-%s' % (pdf_hash, name[-20:])
 
+
 class CaptchaNeedException(Exception):
     pass
 
 
-def main(DOI):
+def main(DOI, destination):
     sh = SciHub()
 
     parser = argparse.ArgumentParser(description='SciHub - To remove all barriers in the way of science.')
@@ -274,39 +276,10 @@ def main(DOI):
         sh.set_proxy(args.proxy)
 
     #if args.download:
-    result = sh.download(DOI, args.output)
+    result = sh.download(DOI, destination)
     if 'err' in result:
         logger.debug('%s', result['err'])
     else:
         logger.debug('Successfully downloaded file with identifier %s', DOI)
 
     return result
-
-    if args.search:
-        results = sh.search(args.search, args.limit)
-        if 'err' in results:
-            logger.debug('%s', results['err'])
-        else:
-            logger.debug('Successfully completed search with query %s', args.search)
-        print(results)
-    elif args.search_download:
-        results = sh.search(args.search_download, args.limit)
-        if 'err' in results:
-            logger.debug('%s', results['err'])
-        else:
-            logger.debug('Successfully completed search with query %s', args.search_download)
-            for paper in results['papers']:
-                result = sh.download(paper['url'], args.output)
-                if 'err' in result:
-                    logger.debug('%s', result['err'])
-                else:
-                    logger.debug('Successfully downloaded file with identifier %s', paper['url'])
-    elif args.file:
-        with open(args.file, 'r') as f:
-            identifiers = f.read().splitlines()
-            for identifier in identifiers:
-                result = sh.download(identifier, args.output)
-                if 'err' in result:
-                    logger.debug('%s', result['err'])
-                else:
-                    logger.debug('Successfully downloaded file with identifier %s', identifier)
