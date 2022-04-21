@@ -4,8 +4,8 @@ import pandas as pd
 
 def openFile(files):
 
-    array = []
-    print(files)
+    data = []
+
     for ROOT_DIR in files:
 
         group = pd.ExcelFile(ROOT_DIR)
@@ -14,12 +14,19 @@ def openFile(files):
         author = sheetX['Authors']
         articleTitle = sheetX['Article Title']
         DOI = sheetX['DOI']
+        sourceTitle = sheetX['Source Title']
+        publicationYear = sheetX['Publication Year']
+        issn = sheetX['ISSN']
+        eissn = sheetX['eISSN']
+        ut = sheetX['UT (Unique ID)']
+        researcherID = sheetX['Researcher Ids']
 
         a = -1
-        for i in DOI:
-            a = a + 1
-            if not 'nan' in str(i):
-                element = [author[a], articleTitle[a], str(i)]
-                array.append(element)
 
-    return array
+        for title in articleTitle:
+            a = a + 1
+            element = [author[a], title, str(DOI[a]), sourceTitle[a], publicationYear[a], issn[a], eissn[a], ut[a],
+                       researcherID[a]]
+            data.append(element)
+
+    return data

@@ -6,10 +6,10 @@ class RecentProjectFileWriter:
     def __init__(self):
         # Get the configparser object
         self.config_object = ConfigParser()
+        self.config_object.read('./Configuration/RecentProjectData.cfg')
 
     def RecentProjectFileWriter(self, projectName, projectLastAccess, projectLocation, projects):
 
-        self.config_object.add_section("RECENT_PROJECT")
         if len(projects) < 5:
             self.config_object.set("RECENT_PROJECT",  "accessible_project_number", str(int(len(projects) + 1)))
         else:
@@ -28,6 +28,12 @@ class RecentProjectFileWriter:
             if i > 5:
                 break
 
-        # Write the above sections to config.cfg file
-        with open('./Configuration/RecentProjectData.cfg', 'w') as conf:
+        with open('./Configuration/RecentProjectData.cfg', 'w+')as conf:
+            self.config_object.write(conf)
+        conf.close()
+
+    def actualice(self, newName):
+        self.config_object.set('RECENT_PROJECT', 'project_name_1', str(newName))
+
+        with open('./Configuration/RecentProjectData.cfg', 'w+') as conf:
             self.config_object.write(conf)

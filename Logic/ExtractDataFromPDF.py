@@ -11,8 +11,5 @@ def ExtractDataFromPDF(DirectoryToSearch, FinalDirectory):
 
     for fileName in allFiles:
         fileDirectory = DirectoryToSearch + '/' + fileName
-        file = open(fileDirectory, 'rb')
-
         documentToSave = FinalDirectory + '/' + str(fileName).replace('.pdf', '.txt')
-        subprocess.call(['java', '-jar', './PDF_Extraction/PDF_Data_Extraction.jar', file, documentToSave])
-
+        subprocess.call(['java', '-jar', './PDF_Extraction/PDF_Data_Extraction.jar', fileDirectory, documentToSave])

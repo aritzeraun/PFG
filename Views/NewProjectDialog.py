@@ -5,11 +5,15 @@ from PyQt5.QtWidgets import QFileDialog
 
 
 class NewProjectDialog(object):
-    def __init__(self, Dialog):
+    def __init__(self, Dialog, typology):
+        self.typology = typology
+
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
-        self.folderInputLine = QtWidgets.QLineEdit(Dialog)
-        self.directoryAccessButton = QtWidgets.QPushButton(Dialog)
-        self.projectNameInputLine = QtWidgets.QLineEdit(Dialog)
+        if self.typology != 1:
+            self.folderInputLine = QtWidgets.QLineEdit(Dialog)
+            self.directoryAccessButton = QtWidgets.QPushButton(Dialog)
+        if self.typology <= 1:
+            self.projectNameInputLine = QtWidgets.QLineEdit(Dialog)
         self.widget = QtWidgets.QWidget(Dialog)
         self.errorMessageLabel = QtWidgets.QLabel(Dialog)
         self.specificationMessageLabel = QtWidgets.QLabel(Dialog)
@@ -33,13 +37,15 @@ class NewProjectDialog(object):
         self.newProjectNameValidated = None
         self.creationState = None
         self.dialog = None
-
         self.setupUi(Dialog)
 
     def setupUi(self, Dialog):
         self.dialog = Dialog
         Dialog.setObjectName("Dialog")
-        Dialog.resize(550, 205)
+        if self.typology == 0:
+            Dialog.resize(550, 205)
+        else:
+            Dialog.resize(550, 160)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -49,58 +55,64 @@ class NewProjectDialog(object):
         Dialog.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.gridLayout.setContentsMargins(-1, 0, -1, 0)
         self.gridLayout.setObjectName("gridLayout")
-        self.folderInputLine.setMinimumSize(QtCore.QSize(400, 0))
-        font = QtGui.QFont()
-        font.setFamily(self.font)
-        font.setBold(False)
-        font.setWeight(50)
-        self.folderInputLine.setFont(font)
-        self.folderInputLine.setStyleSheet("QLineEdit {\n"
-                                           "    border: 2px solid rgb" + self.secondaryColor + ";\n"
-                                           "    border-radius: 10px;\n"
-                                           "    background-color: rgb(255, 255, 255);\n"
-                                           "    padding-left: 10px;\n"
-                                           "    padding-right: 10px;\n"
-                                           "}\n"
-                                           "QLineEdit:hover {\n"
-                                           "    border: 2px solid rgb" + self.mainColor + ";\n"
-                                           "}")
-        self.folderInputLine.setReadOnly(True)
-        self.folderInputLine.setClearButtonEnabled(False)
-        self.folderInputLine.setObjectName("lineEdit_2")
-        self.gridLayout.addWidget(self.folderInputLine, 2, 0, 1, 1)
+
+        if self.typology != 1:
+            self.folderInputLine.setMinimumSize(QtCore.QSize(400, 0))
+            font = QtGui.QFont()
+            font.setFamily(self.font)
+            font.setBold(False)
+            font.setWeight(50)
+            self.folderInputLine.setFont(font)
+            self.folderInputLine.setStyleSheet("QLineEdit {\n"
+                                               "    border: 2px solid rgb" + self.secondaryColor + ";\n"
+                                               "    border-radius: 10px;\n"
+                                               "    background-color: rgb(255, 255, 255);\n"
+                                               "    padding-left: 10px;\n"
+                                               "    padding-right: 10px;\n"
+                                               "}\n"
+                                               "QLineEdit:hover {\n"
+                                               "    border: 2px solid rgb" + self.mainColor + ";\n"
+                                               "}")
+            self.folderInputLine.setReadOnly(True)
+            self.folderInputLine.setClearButtonEnabled(False)
+            self.folderInputLine.setObjectName("lineEdit_2")
+            self.gridLayout.addWidget(self.folderInputLine, 2, 0, 1, 1)
+
+            self.directoryAccessButton.setStyleSheet("QPushButton{\n"
+                                                     "    border: 0px solid;\n"
+                                                     "    border-radius: 2px;\n"
+                                                     "    background-color: rgb" + self.secondaryColor + ";\n"
+                                                     "    padding-right:0px;\n"
+                                                     "    padding-left: 0px;\n"
+                                                     "}")
+            self.directoryAccessButton.setText("")
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap('./Resources/img/folder_open_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            self.directoryAccessButton.setIcon(icon)
+            self.directoryAccessButton.setObjectName("directoryAccessButton")
+            self.gridLayout.addWidget(self.directoryAccessButton, 2, 1, 1, 1)
+
+        if self.typology <= 1:
+            font = QtGui.QFont()
+            font.setFamily(self.font)
+            self.projectNameInputLine.setFont(font)
+            self.projectNameInputLine.setStyleSheet("QLineEdit {\n"
+                                                    "    border: 2px solid rgb" + self.secondaryColor + ";\n"
+                                                    "    border-radius: 10px;\n"
+                                                    "    background-color: rgb(255, 255, 255);\n"
+                                                    "    padding-left: 10px;\n"
+                                                    "    padding-right: 10px;\n"
+                                                    "}\n"
+                                                    "QLineEdit:hover {\n"
+                                                    "    border: 2px solid rgb" + self.mainColor + ";\n"
+                                                    "}")
+            self.projectNameInputLine.setObjectName("locationInput")
+            self.gridLayout.addWidget(self.projectNameInputLine, 1, 0, 1, 1)
+
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout.addItem(spacerItem, 3, 0, 1, 1)
         spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout.addItem(spacerItem1, 0, 0, 1, 1)
-        self.directoryAccessButton.setStyleSheet("QPushButton{\n"
-                                                 "    border: 0px solid;\n"
-                                                 "    border-radius: 2px;\n"
-                                                 "    background-color: rgb" + self.secondaryColor + ";\n"
-                                                 "    padding-right:0px;\n"
-                                                 "    padding-left: 0px;\n"
-                                                 "}")
-        self.directoryAccessButton.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap('./Resources/img/folder_open_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.directoryAccessButton.setIcon(icon)
-        self.directoryAccessButton.setObjectName("directoryAccessButton")
-        self.gridLayout.addWidget(self.directoryAccessButton, 2, 1, 1, 1)
-        font = QtGui.QFont()
-        font.setFamily(self.font)
-        self.projectNameInputLine.setFont(font)
-        self.projectNameInputLine.setStyleSheet("QLineEdit {\n"
-                                                "    border: 2px solid rgb" + self.secondaryColor + ";\n"
-                                                "    border-radius: 10px;\n"
-                                                "    background-color: rgb(255, 255, 255);\n"
-                                                "    padding-left: 10px;\n"
-                                                "    padding-right: 10px;\n"
-                                                "}\n"
-                                                "QLineEdit:hover {\n"
-                                                "    border: 2px solid rgb" + self.mainColor + ";\n"
-                                                "}")
-        self.projectNameInputLine.setObjectName("locationInput")
-        self.gridLayout.addWidget(self.projectNameInputLine, 1, 0, 1, 1)
         self.widget.setMinimumSize(QtCore.QSize(0, 50))
         self.widget.setObjectName("widget")
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -167,10 +179,13 @@ class NewProjectDialog(object):
         self.translateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-        self.directoryAccessButton.clicked.connect(lambda: self.openNewProjectDirectory())
         self.createPushButton.clicked.connect(lambda: self.createNewProject())
         self.cancelPushButton.clicked.connect(lambda: self.cancelNewProject())
-        self.projectNameInputLine.textChanged.connect(lambda: self.projectNameVerifier())
+
+        if self.typology != 1:
+            self.directoryAccessButton.clicked.connect(lambda: self.openNewProjectDirectory())
+        if self.typology <= 1:
+            self.projectNameInputLine.textChanged.connect(lambda: self.projectNameVerifier())
 
     def projectNameVerifier(self):
 
@@ -192,22 +207,40 @@ class NewProjectDialog(object):
 
     def createNewProject(self):
         _translate = QtCore.QCoreApplication.translate
-        if self.folderInputLine.text() != '' and self.projectNameInputLine.text() != '' \
-                and self.newProjectNameValidated:
-            self.errorMessageLabel.setText('')
-            self.newProjectName = self.projectNameInputLine.text()
-            self.newProjectLocation = self.folderInputLine.text()
-            self.creationState = True
-            self.dialog.close()
-        elif self.projectNameInputLine.text() == '':
-            self.errorMessageLabel.setText(_translate("Dialog",
-                                                      str(self.config.get('NewProjectDialogSection',
-                                                                          'projectNameInput_empty_error_message'))
-                                                      .encode('ansi')))
-        elif self.folderInputLine.text() == '':
-            self.errorMessageLabel.setText(_translate("Dialog", str(self.config.get('NewProjectDialogSection',
-                                                                                    'folderInput_empty_error_message'))
-                                           .encode('ansi')))
+        if self.typology == 0:
+            if self.folderInputLine.text() != '' and self.projectNameInputLine.text() != '' \
+                    and self.newProjectNameValidated:
+                self.errorMessageLabel.setText('')
+                self.newProjectName = self.projectNameInputLine.text()
+                self.newProjectLocation = self.folderInputLine.text()
+                self.creationState = True
+                self.dialog.close()
+        elif self.typology == 1:
+            if self.projectNameInputLine.text() != ''and self.newProjectNameValidated:
+                self.errorMessageLabel.setText('')
+                self.newProjectName = self.projectNameInputLine.text()
+                self.creationState = True
+                self.dialog.close()
+        elif self.typology == 2:
+            if self.folderInputLine.text() != '':
+                self.errorMessageLabel.setText('')
+                self.newProjectLocation = self.folderInputLine.text()
+                self.creationState = True
+                self.dialog.close()
+
+        if self.typology <= 1:
+            if self.projectNameInputLine.text() == '':
+                self.errorMessageLabel.setText(_translate("Dialog",
+                                                          str(self.config.get('NewProjectDialogSection',
+                                                                              'projectNameInput_empty_error_message'))
+                                                          .encode('ansi')))
+
+        if self.typology != 1:
+            if self.folderInputLine.text() == '':
+                self.errorMessageLabel.setText(_translate("Dialog",
+                                                          str(self.config.get('NewProjectDialogSection',
+                                                                              'folderInput_empty_error_message'))
+                                               .encode('ansi')))
 
     def cancelNewProject(self):
         self.creationState = False
@@ -221,19 +254,35 @@ class NewProjectDialog(object):
 
     def translateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", str(self.config.get('NewProjectDialogSection', 'window_title_text'))
-                                         .encode('ansi')))
-        self.folderInputLine.setPlaceholderText(_translate("Dialog",
-                                                           str(self.config.get('NewProjectDialogSection',
-                                                                               'location_inputLine_placeholder_text'))
-                                                           .encode('ansi')))
-        self.projectNameInputLine.setPlaceholderText(_translate("Dialog",
-                                                                str(self.config.get('NewProjectDialogSection',
-                                                                                    'name_inputLine_placeholder_text'))
-                                                                .encode('ansi')))
-        self.createPushButton.setText(_translate("Dialog",  str(self.config.get('NewProjectDialogSection',
-                                                                                'createButton_text'))
-                                                 .encode('ansi')))
+        if self.typology == 0:
+            Dialog.setWindowTitle(_translate("Dialog", str(self.config.get('NewProjectDialogSection',
+                                                                           'window_title_0_text')).encode('ansi')))
+        elif self.typology == 1:
+            Dialog.setWindowTitle(_translate("Dialog", str(self.config.get('NewProjectDialogSection',
+                                                                           'window_title_1_text')).encode('ansi')))
+        elif self.typology == 2:
+            Dialog.setWindowTitle(_translate("Dialog", str(self.config.get('NewProjectDialogSection',
+                                                                           'window_title_2_text')).encode('ansi')))
+        if self.typology != 1:
+            self.folderInputLine.setPlaceholderText(
+                _translate("Dialog", str(self.config.get('NewProjectDialogSection',
+                                                         'location_inputLine_placeholder_text'))
+                           .encode('ansi')))
+
+        if self.typology <= 1:
+            self.projectNameInputLine.setPlaceholderText(
+                _translate("Dialog", str(self.config.get('NewProjectDialogSection', 'name_inputLine_placeholder_text'))
+                           .encode('ansi')))
+
+        if self.typology == 0:
+            self.createPushButton.setText(_translate("Dialog",  str(self.config.get('NewProjectDialogSection',
+                                                                                    'createButton_text'))
+                                                     .encode('ansi')))
+        elif self.typology >= 1:
+            self.createPushButton.setText(_translate("Dialog",  str(self.config.get('NewProjectDialogSection',
+                                                                                    'changeButton_text'))
+                                                     .encode('ansi')))
+
         self.cancelPushButton.setText(_translate("Dialog", str(self.config.get('NewProjectDialogSection',
                                                                                'cancelButton_text'))
                                                  .encode('ansi')))

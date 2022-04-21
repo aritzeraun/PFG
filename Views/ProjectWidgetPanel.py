@@ -1,11 +1,7 @@
 import configparser
-from datetime import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
-from Views import NewProjectDialog, ApplicationView
-from Logic import RecentProjectFileWriter
-import os
-import errno
+
+from Logic import CreateNewProject, OpenProject, RecentProject
 
 
 class ProjectWidgetPanel(object):
@@ -244,6 +240,7 @@ class ProjectWidgetPanel(object):
         self.translateUi()
         QtCore.QMetaObject.connectSlotsByName(Form)
 
+        # define users possible actions
         self.newProjectButton.clicked.connect(lambda: self.createNewProject())
         self.openButton.clicked.connect(lambda: self.openProject())
         self.tableWidget.cellClicked.connect(self.changeItemState)
@@ -282,46 +279,20 @@ class ProjectWidgetPanel(object):
             self.recentProjects_label.setVisible(False)
 
     def openProject(self):
-        folder = str(QFileDialog.getExistingDirectory(None, "Select Project"))
-        name = folder.split('/')
-        self.newProjectName = name[len(name)-1]
-        self.location = folder
-        print(self.newProjectName)
+        OpenProject.openProject(self.recentProjectsData, self.MainWindow,
+                                self.config.get('ProjectWidgetPanelSection',
+                                                'open_project_QFileDialog_title'))
 
     def changeItemState(self, row):
         recentProject = self.recentProjectsData.pop(row)
-        RecentProjectFileWriter.RecentProjectFileWriter().RecentProjectFileWriter(recentProject[0],
-                                                                                  datetime.today().strftime('%Y-%m-%d'),
-                                                                                  recentProject[2],
-                                                                                  self.recentProjectsData)
-        projectDirectory = recentProject[2] + '/' + recentProject[0]
-        if os.path.exists(projectDirectory):
-            ApplicationView.ApplicationView(self.MainWindow, self.recentProjectsData, projectDirectory,
-                                            recentProject[0])
-        else:
-            msgBoxLogin = QMessageBox()
-            msgBoxLogin.setText(self.config.get('LoginWidgetPanelSection', 'messageBox_alert_loginError_text'))
-            msgBoxLogin.exec()
+        RecentProject.RecentProject(recentProject, self.MainWindow, self.recentProjectsData,
+                                    self.config.get('ProjectWidgetPanelSection',
+                                                    'messageBox_project_directory_not_found_message'))
 
     def createNewProject(self):
-        dialog = QtWidgets.QDialog()
-        newProjectDialog = NewProjectDialog.NewProjectDialog(dialog)
-        dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        dialog.exec_()
-        if newProjectDialog.creationState:
-            ProjectDirectory = str(newProjectDialog.newProjectLocation + '/' + newProjectDialog.newProjectName)
-            try:
-                os.mkdir(ProjectDirectory)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise
-
-            ApplicationView.ApplicationView(self.MainWindow, self.recentProjectsData, ProjectDirectory,
-                                            newProjectDialog.newProjectName)
-
-            RecentProjectFileWriter.RecentProjectFileWriter()\
-                .RecentProjectFileWriter(newProjectDialog.newProjectName, datetime.today().strftime('%Y-%m-%d'),
-                                         newProjectDialog.newProjectLocation, self.recentProjectsData)
+        CreateNewProject.createNewProject(self.recentProjectsData, self.MainWindow,
+                                          self.config.get('ProjectWidgetPanelSection',
+                                                          'messageBox_project_already_exists_message'))
 
     def translateUi(self):
         _translate = QtCore.QCoreApplication.translate

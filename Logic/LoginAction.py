@@ -20,7 +20,7 @@ class LoginAction(QThread):
     def run(self):
         self.connection.driverCreator()
         ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
-        if  ip != "193.146.227.236" and ip != "193.146.227.237":
+        if ip != "193.146.227.236" and ip != "193.146.227.237":
             self.loginActionSuccess = self.connection.loginWebOfScience(self.username, self.password, self.userTypology)
         else:
             self.loginActionSuccess = True
