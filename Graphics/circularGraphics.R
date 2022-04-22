@@ -1,5 +1,4 @@
 args <- commandArgs(trailingOnly = TRUE)
-print(args)
 
 library(circlize)
 library(migest)
@@ -7,7 +6,7 @@ library(dplyr)
 library(arulesViz)
 library(randomcoloR)
 
-itemsetsMAXICLAVECLUSTER <- readLines(con = paste("C:\\Users\\eraun\\OneDrive\\Escritorio\\ejemplo\\Extraction_file\\Docs.csv", sep=""))
+itemsetsMAXICLAVECLUSTER <- readLines(con = paste(args[1], sep=""))
 
 itemsetsMAXICLAVECLUSTER <- strsplit(itemsetsMAXICLAVECLUSTER, ",")
 head(itemsetsMAXICLAVECLUSTER, 1)
@@ -45,12 +44,18 @@ dataFrameMAXICLAVECLUSTER<- data.frame(
 labels(rulesMAXICLAVECLUSTER)
 dev.new(width=1000, height=8000)
 #
-jpeg(file=paste("C:\\Users\\eraun\\OneDrive\\Escritorio\\ejemplo\\Extraction_file\\PalabrasgraphPruebs.jpeg", sep=""),width=10000,height=8000, res=100)
+widthImage <- strtoi(args[2])
+widthImage <- widthImage*10
+
+heightImage <- strtoi(args[3])
+heightImage <- heightImage*10
+
+jpeg(file=paste(args[5], sep=""),width=widthImage,height=heightImage, res=100)
 plot(rulesMAXICLAVECLUSTER, method="graph",engine="igraph",cex=7,  control=list(max=length(rulesMAXICLAVECLUSTER)))
 dev.off()
-# labelCol = c('blue','black','blue','blue'),
+
 dev.new(width=500, height=400)
-jpeg(file=paste("C:\\Users\\eraun\\OneDrive\\Escritorio\\ejemplo\\Extraction_file\\PalabrasBalls.jpeg", sep=""),width=10000,height=8000,res=600)
-# chordDiagram(as.data.frame(dataFrameMAXICLAVECLUSTER),grid.col = coloresCluster, transparency = 0.3, directional = TRUE)
+jpeg(file=paste(args[4], sep=""),width=widthImage,height=heightImage,res=600)
+
 chordDiagram(as.data.frame(dataFrameMAXICLAVECLUSTER),transparency = 0.3, directional = FALSE)
 dev.off()

@@ -148,7 +148,7 @@ class WelcomeView(object):
             self.licenseOptionButton.setStyleSheet("background-color: rgb" + self.mainColor + "; border: none;")
             LicenseView = QtWidgets.QWidget(self.centralWidget)
             self.horizontalLayout.addWidget(LicenseView)
-            licenseViewController = LicenseWidgetPanel.Ui_Form(LicenseView)
+            licenseViewController = LicenseWidgetPanel.LicenseWidgetPanel(LicenseView)
             self.sectionViews.close()
             self.sectionViews = licenseViewController.Form
 

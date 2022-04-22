@@ -4,7 +4,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QFile, QTextStream
 
 
-class Ui_Form(object):
+class LicenseWidgetPanel(object):
+
     def __init__(self, Form):
         self.Form = Form
         self.gridLayout = QtWidgets.QGridLayout(Form)

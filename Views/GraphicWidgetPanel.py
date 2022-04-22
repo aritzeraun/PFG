@@ -1,17 +1,25 @@
 import configparser
+import errno
+import os
 import shutil
 import threading
+from os.path import exists
 
 from PIL import Image
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QMovie
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from Logic import GraphicCreator
+from Views import DialogWidget
 
 
 class GraphicWidgetPanel(object):
     def __init__(self, Form, centralWidget, MainWindow, ProjectDirectory):
+        self.Form = Form
+        self.centralWidget = centralWidget
+        self.MainWindow = MainWindow
+        self.ProjectDirectory = ProjectDirectory
 
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.graphicLabel = QtWidgets.QLabel(Form)
@@ -26,10 +34,6 @@ class GraphicWidgetPanel(object):
         self.heightLabel = QtWidgets.QLabel(self.widget)
         self.heightSpinBox = QtWidgets.QSpinBox(self.widget)
         self.exportButton = QtWidgets.QPushButton(self.widgetTop)
-        self.Form = Form
-        self.centralWidget = centralWidget
-        self.MainWindow = MainWindow
-        self.ProjectDirectory = ProjectDirectory
 
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
@@ -70,7 +74,7 @@ class GraphicWidgetPanel(object):
         self.widget.setMaximumSize(QtCore.QSize(16777215, 80))
         self.widget.setObjectName("widget")
         self.gridLayoutTop.setObjectName("gridLayoutTop")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.gridLayoutTop.addItem(spacerItem, 0, 1, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
@@ -90,8 +94,8 @@ class GraphicWidgetPanel(object):
         self.gridLayoutTop.addWidget(self.createGraphicButton, 0, 2, 1, 1)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayoutTop.addItem(spacerItem1, 0, 3, 1, 1)
-        self.typeOfGraphicCombo.setMinimumSize(QtCore.QSize(130, 0))
-        self.typeOfGraphicCombo.setMaximumSize(QtCore.QSize(165, 16777215))
+        self.typeOfGraphicCombo.setMinimumSize(QtCore.QSize(190, 0))
+        self.typeOfGraphicCombo.setMaximumSize(QtCore.QSize(190, 16777215))
         font = QtGui.QFont()
         font.setFamily(self.font)
         font.setPointSize(int(self.fontSize))
@@ -136,9 +140,9 @@ class GraphicWidgetPanel(object):
         font.setPointSize(int(self.fontSize))
         self.heightSpinBox.setFont(font)
         self.heightSpinBox.setMinimum(300)
-        self.heightSpinBox.setMaximum(1600)
+        self.heightSpinBox.setMaximum(2000)
         self.heightSpinBox.setSingleStep(100)
-        self.heightSpinBox.setProperty("value", 1600)
+        self.heightSpinBox.setProperty("value", 1000)
         self.heightSpinBox.setObjectName("heightSpinBox")
         self.gridLayoutTop.addWidget(self.heightSpinBox, 1, 5, 1, 1)
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
@@ -165,15 +169,42 @@ class GraphicWidgetPanel(object):
         self.exportButton.setObjectName("exportButton")
         self.gridLayoutSecond.addWidget(self.exportButton, 0, 1, 1, 1)
         self.gridLayout.addWidget(self.widgetTop, 1, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem, 0, 1, 1, 1)
 
-        self.translateUi(Form)
+        self.translateUi()
         QtCore.QMetaObject.connectSlotsByName(Form)
 
         self.createGraphicButton.clicked.connect(lambda: self.createGraphics())
+        self.typeOfGraphicCombo.currentTextChanged.connect(lambda: self.changeImageOfLabel())
+        self.exportButton.clicked.connect(lambda: self.exportImageResult())
 
-        self.exportButton.setEnabled(False)
-        self.typeOfGraphicCombo.setEnabled(False)
+        self.initialCheck()
         self.movie.start()
+
+    def initialCheck(self):
+        if exists(self.GraphicsFolder) and exists(self.graphImageName) and exists(self.circularImageName):
+            self.changeImageOfLabel()
+        else:
+            self.exportButton.setEnabled(False)
+            self.typeOfGraphicCombo.setEnabled(False)
+
+    def changeImageOfLabel(self):
+        pixmap_image = ''
+        self.graphicLabel.clear()
+
+        if 'Graph ' in self.typeOfGraphicCombo.currentText():
+            pixmap_image = QtGui.QPixmap(self.graphImageName)
+        elif 'Circular' in self.typeOfGraphicCombo.currentText():
+            pixmap_image = QtGui.QPixmap(self.circularImageName)
+
+        pixmap_image.scaled(1000, 1000, QtCore.Qt.KeepAspectRatio)
+
+        self.graphicLabel.setPixmap(pixmap_image)
+        self.graphicLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.graphicLabel.setScaledContents(True)
+        self.graphicLabel.setMinimumSize(1, 1)
+        self.graphicLabel.show()
 
     def loadViewThread(self):
         # change login view
@@ -182,8 +213,10 @@ class GraphicWidgetPanel(object):
         self.graphicLabel.setMovie(self.movie)
         self.typeOfGraphicCombo.setEnabled(False)
         self.exportButton.setEnabled(False)
+        self.widthLabel.setEnabled(False)
         self.widthSpinBox.setEnabled(False)
         self.heightLabel.setEnabled(False)
+        self.heightSpinBox.setEnabled(False)
         self.createGraphicButton.setEnabled(False)
 
     def thread_image_creation_correctly(self):
@@ -192,8 +225,10 @@ class GraphicWidgetPanel(object):
         self.graphicLabel.setMovie(self.movie)
         self.typeOfGraphicCombo.setEnabled(True)
         self.exportButton.setEnabled(True)
+        self.widthLabel.setEnabled(True)
         self.widthSpinBox.setEnabled(True)
         self.heightLabel.setEnabled(True)
+        self.heightSpinBox.setEnabled(True)
         self.createGraphicButton.setEnabled(True)
 
         pixmap_image = ''
@@ -201,47 +236,100 @@ class GraphicWidgetPanel(object):
         if 'Graph' in self.typeOfGraphicCombo.currentText():
             pixmap_image = QtGui.QPixmap(self.graphImageName)
         elif 'Circular' in self.typeOfGraphicCombo.currentText():
-            pixmap_image = QtGui.QPixmap(self.graphImageName)
+            pixmap_image = QtGui.QPixmap(self.circularImageName)
 
         self.graphicLabel.setPixmap(pixmap_image)
         self.graphicLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.graphicLabel.setScaledContents(True)
+        self.graphicLabel.devicePixelRatioFScale()
         self.graphicLabel.setMinimumSize(1, 1)
         self.graphicLabel.show()
 
     def createGraphics(self):
 
-        loadView = threading.Thread(name="loadViewThread", target=self.loadViewThread)
+        # it saved the window format
+        self.graphicLabel.clear()
+        self.graphicLabel.setScaledContents(False)
 
-        self.thread = GraphicCreator.GraphicCreatorAction(self.matrixAnalysisFile, self.widthSpinBox.value(),
-                                                          self.heightSpinBox.value(), self.circularImageName,
-                                                          self.graphImageName)
-        self.thread.image_creation_correctly.connect(self.thread_image_creation_correctly)
+        if not exists(self.GraphicsFolder):
+            editState = True
+            try:
+                os.mkdir(self.GraphicsFolder)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
+        else:
+            if exists(self.graphImageName) and exists(self.circularImageName):
+                dialog = QtWidgets.QDialog(self.centralWidget)
+                text_1 = str(self.config.get('GraphViewSection', 'dialog_widget_message_text_1'))
+                text_2 = str(self.config.get('GraphViewSection', 'dialog_widget_message_text_2'))
+                controller = DialogWidget.DialogWidget(dialog, text_1, text_2)
+                dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+                dialog.exec_()
 
-        loadView.start()
-        self.thread.start()
+                if controller.state:
+                    editState = True
+                else:
+                    editState = False
+                    self.initialCheck()
+            else:
+                editState = True
 
-    def exportProject(self):
-        options = QFileDialog.Options()
-        folder = str(QFileDialog.getSaveFileName(None, "Select graphic export location", "",
-                                                 "JPG (*.jpg);;PNG (*.png);; PDF (*.pdf)", options=options))
+        if editState:
+            loadView = threading.Thread(name="loadViewThread", target=self.loadViewThread)
 
-        if 'JPG' in folder[1]:
-            shutil.copy("src", str(folder[0]))
-        elif 'PNG' in folder[1]:
-            image = Image.open(r'path where the JPG is stored\file name.jpg')
-            image.save(str(folder[0]))
-        elif 'PDF' in folder[1]:
-            image_1 = Image.open(r'C:\Users\Ron\Desktop\Test\view_1.jpg')
-            im_1 = image_1.convert('RGB')
-            im_1.save(str(folder[0]))
+            self.thread = GraphicCreator.GraphicCreatorAction(self.matrixAnalysisFile, self.widthSpinBox.value(),
+                                                              self.heightSpinBox.value(), self.circularImageName,
+                                                              self.graphImageName)
+            self.thread.image_creation_correctly.connect(self.thread_image_creation_correctly)
+            loadView.start()
+            self.thread.start()
 
-    def translateUi(self, Form):
+    def exportImageResult(self):
+
+        source = ''
+        if 'Graph' in self.typeOfGraphicCombo.currentText():
+            source = self.graphImageName
+        elif 'Circular' in self.typeOfGraphicCombo.currentText():
+            source = self.circularImageName
+
+        if exists(self.GraphicsFolder) and exists(source):
+
+            options = QFileDialog.Options()
+            folder = QFileDialog.getSaveFileName(None, str(self.config.get('GraphViewSection', 'file_dialog_title'))
+                                                 .encode('ansi'), "",
+                                                 "JPG (*.jpg);;PNG (*.png);; PDF (*.pdf)", options=options)
+
+            if 'JPG' in folder[1]:
+                shutil.copy(source, str(folder[0]))
+            elif 'PNG' in folder[1]:
+                image = Image.open(source)
+                image.save(str(folder[0]))
+            elif 'PDF' in folder[1]:
+                image_1 = Image.open(source)
+                im_1 = image_1.convert('RGB')
+                im_1.save(str(folder[0]))
+        else:
+            ErrorBox = QMessageBox()
+            ErrorBox.setText(str(self.config.get('GraphViewSection', 'error_exporting_label_message')).encode('ansi'))
+            ErrorBox.exec()
+
+    def translateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.createGraphicButton.setText(_translate("Form", "Create Graphic"))
-        self.typeOfGraphicCombo.setItemText(0, _translate("Form", "Graph graphic"))
-        self.typeOfGraphicCombo.setItemText(1, _translate("Form", "Circular graphic"))
-        self.widthLabel.setText(_translate("Form", "Width: "))
-        self.heightLabel.setText(_translate("Form", "Height:"))
-        self.exportButton.setText(_translate("Form", "Export"))
+        self.createGraphicButton.setText(_translate("Form",
+                                                    str(self.config.get('GraphViewSection',
+                                                                        'create_graphics_button_text')).encode('ansi')))
+        self.typeOfGraphicCombo.setItemText(0, _translate("Form",
+                                                          str(self.config.get('GraphViewSection',
+                                                                              'type_of_graphic_combo_bos_option_0'))
+                                                          .encode('ansi')))
+        self.typeOfGraphicCombo.setItemText(1, _translate("Form",
+                                                          str(self.config.get('GraphViewSection',
+                                                                              'type_of_graphic_combo_bos_option_1'))
+                                                          .encode('ansi')))
+        self.widthLabel.setText(_translate("Form", str(self.config.get('GraphViewSection',
+                                                                       'width_label_text')).encode('ansi')))
+        self.heightLabel.setText(_translate("Form", str(self.config.get('GraphViewSection',
+                                                                        'height_label_text')).encode('ansi')))
+        self.exportButton.setText(_translate("Form", str(self.config.get('GraphViewSection',
+                                                                         'export_button_text')).encode('ansi')))

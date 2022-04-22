@@ -17,7 +17,8 @@ class GraphicCreatorAction(QThread):
         self.graphDirectory = graphDirectory
 
     def run(self):
-
-        subprocess.call("Rscript graficasCirculares.R", shell=True)
+        call = "Rscript ./Graphics/circularGraphics.R " + str(self.directoryToDataFile) + " " + str(self.width)
+        call = call + " " + str(self.height) + " " + str(self.circularDirectory) + " " + str(self.graphDirectory)
+        subprocess.call(call, shell=True)
         time.sleep(10)
         self.image_creation_correctly.emit()

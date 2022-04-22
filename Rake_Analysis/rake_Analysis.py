@@ -157,10 +157,11 @@ def readCSVFile(keyListFilePath):
     for linea in open(keyListFilePath, "r", encoding="iso-8859-1"):
         readLine = linea.split(",")
         clave = readLine[0]
-        valor = readLine[1]
-        valor = valor.rstrip()
-        if valor != "":
-            wordsDictionary[clave] = valor
+        if len(readLine) > 1:
+            valor = str(readLine[1]).replace('\n', '')
+            valor = valor.rstrip()
+            if valor != "":
+                wordsDictionary[clave] = valor
     return wordsDictionary
 
 

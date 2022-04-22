@@ -1,22 +1,38 @@
 import configparser
 import os
-import time
+import threading
 from os.path import exists
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QMessageBox
 
-from Rake_Analysis import rake_Analysis
-from Views import GraphicWidgetPanel
+from Views import DialogWidget
+from Logic import FindKeyWords, AnalyseDocuments
 
 
 class KeyWordsWidgetPanel(object):
 
     def __init__(self, Form, centralWidget, MainWindow, ProjectDirectory):
+
         self.Form = Form
         self.centralWidget = centralWidget
         self.MainWindow = MainWindow
         self.ProjectDirectory = ProjectDirectory
+
+        self.gridLayout = QtWidgets.QGridLayout(Form)
+        self.tableWidget = QtWidgets.QTableWidget(Form)
+        self.widget = QtWidgets.QWidget(Form)
+        self.generalGridLayout = QtWidgets.QGridLayout(self.widget)
+        self.labelWidget = QtWidgets.QWidget(self.widget)
+        self.labelWidgetLayout = QtWidgets.QGridLayout(self.labelWidget)
+        self.gifChargingLabel = QtWidgets.QLabel(self.labelWidget)
+        self.buttonsWidget = QtWidgets.QWidget(self.widget)
+        self.buttonsWidgetLayout = QtWidgets.QGridLayout(self.buttonsWidget)
+        self.findKeysButton = QtWidgets.QPushButton(self.buttonsWidget)
+        self.addKeyButton = QtWidgets.QPushButton(self.buttonsWidget)
+        self.analiseButton = QtWidgets.QPushButton(self.buttonsWidget)
+        self.createGraphicsButton = QtWidgets.QPushButton(self.buttonsWidget)
 
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
@@ -27,12 +43,14 @@ class KeyWordsWidgetPanel(object):
         self.keyExtractionFolder = self.ProjectDirectory + '/'
         self.keyExtractionFolder = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
                                                                                      'analysis_folder_name') + '/'
-        self.downloadedFilesFolder = self.ProjectDirectory + '/' + self.configGeneral.get('LOCATIONS',
-                                                                               'downloaded_files_folder_name')+'/'
+        self.downloadFilesFolder = self.ProjectDirectory + '/'
+        self.downloadFilesFolder = self.downloadFilesFolder + self.configGeneral.get('LOCATIONS',
+                                                                                     'downloaded_files_folder_name')+'/'
         self.keyListFilePath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS', 'key_list_file_name')
         self.stopPathFile = self.configGeneral.get('LOCATIONS', 'stop_file_relative_path')
         self.relationFilePath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS', 'key_relation_file_name')
-        self.uniqueKeysFilePath = self.keyExtractionFolder+self.configGeneral.get('LOCATIONS', 'unique_keys_file_name')
+        self.uniqueKeysFilePath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
+                                                                                    'unique_keys_file_name')
         self.matrixAnalysisFile = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
                                                                                     'matrix_analysis_file_name')
         self.finalDocumentPath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
@@ -46,7 +64,10 @@ class KeyWordsWidgetPanel(object):
         self.colorOfItem = self.colorOfItem.replace(')', '')
         self.colorOfItem = self.colorOfItem.replace(' ', '') + ','
         self.colorOfItem = self.colorOfItem.split(',')
+
         self.state = 0
+        self.thread = None
+        self.movie = QMovie("./Resources/img/process_running_gif.gif")
 
         self.setupUi(self.Form)
 
@@ -59,96 +80,165 @@ class KeyWordsWidgetPanel(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
         Form.setSizePolicy(sizePolicy)
-        self.gridLayout = QtWidgets.QGridLayout(Form)
         self.gridLayout.setObjectName("gridLayout")
-        self.tableWidget = QtWidgets.QTableWidget(Form)
         self.tableWidget.setMinimumSize(QtCore.QSize(600, 0))
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
         self.tableWidget.setFont(font)
+        self.tableWidget.setStyleSheet("alternate-background-color: rgb(85, 170, 255);\n"
+                                       " font: " + str(self.fontSize) + "pt " + self.font + ";")
+        self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.setShowGrid(True)
         self.tableWidget.setWordWrap(False)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(3)
         self.tableWidget.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
+        item.setBackground(QtGui.QColor(85, 170, 255))
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        item.setBackground(QtGui.QColor(85, 170, 255))
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        item.setBackground(QtGui.QColor(85, 170, 255))
         self.tableWidget.setHorizontalHeaderItem(2, item)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(30)
         self.tableWidget.horizontalHeader().setSortIndicatorShown(False)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setVisible(True)
         self.tableWidget.verticalHeader().setHighlightSections(False)
+        self.tableWidget.setColumnWidth(0, 35)
+        self.tableWidget.setColumnWidth(1, 435)
         self.gridLayout.addWidget(self.tableWidget, 1, 0, 1, 1)
-        self.frame = QtWidgets.QFrame(Form)
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.frame)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_2.addItem(spacerItem, 0, 0, 1, 1)
-        self.downloadButton = QtWidgets.QPushButton(self.frame)
-        font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        self.downloadButton.setFont(font)
+        self.widget.setMinimumSize(QtCore.QSize(0, 50))
+        self.widget.setObjectName("widget")
+        self.generalGridLayout.setObjectName("generalGridLayout")
+        self.labelWidget.setMinimumSize(QtCore.QSize(100, 100))
+        self.labelWidget.setObjectName("labelWidget")
+        self.labelWidgetLayout.setObjectName("labelWidgetLayout")
+        self.gifChargingLabel.setMinimumSize(QtCore.QSize(100, 0))
+        self.gifChargingLabel.setText("")
+        self.gifChargingLabel.setObjectName("gifChargingLabel")
+        self.labelWidgetLayout.addWidget(self.gifChargingLabel, 0, 0, 1, 1)
+        self.generalGridLayout.addWidget(self.labelWidget, 1, 1, 1, 1)
+        spacerItemLeft = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.generalGridLayout.addItem(spacerItemLeft, 1, 2, 1, 1)
+        spacerItemRight = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.generalGridLayout.addItem(spacerItemRight, 1, 0, 1, 1)
+        self.buttonsWidget.setMinimumSize(QtCore.QSize(100, 100))
+        self.buttonsWidget.setObjectName("buttonsWidget")
+        self.buttonsWidgetLayout.setObjectName("buttonsWidgetLayout")
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.findKeysButton.setFont(font)
+        self.findKeysButton.setStyleSheet("QPushButton {\n"
+                                          "    border: 2px solid;\n"
+                                          "     border-radius: 10px;\n"
+                                          "    background-color: rgb" + self.secondaryColor + ";\n"
+                                          "    padding-right: 20px;\n"
+                                          "    padding-left: 20px;\n"
+                                          "}\n"
+                                          "QPushButton:hover {\n"
+                                          "    background-color: rgb" + self.mainColor + ";\n"
+                                          "}")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("bitmap.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.downloadButton.setIcon(icon)
-        self.downloadButton.setObjectName("downloadButton")
-        self.gridLayout_2.addWidget(self.downloadButton, 0, 2, 1, 1)
-        self.pushButton = QtWidgets.QPushButton(self.frame)
+        self.findKeysButton.setIcon(icon)
+        self.findKeysButton.setObjectName("findKeysButton")
+        self.buttonsWidgetLayout.addWidget(self.findKeysButton, 0, 0, 1, 1)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.addKeyButton.setFont(font)
+        self.addKeyButton.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.addKeyButton.setStyleSheet("QPushButton {\n"
+                                        "    border: 2px solid;\n"
+                                        "     border-radius: 10px;\n"
+                                        "    background-color: rgb" + self.secondaryColor + ";\n"
+                                        "    padding-right: 20px;\n"
+                                        "    padding-left: 20px;\n"
+                                        "}\n"
+                                        "QPushButton:hover {\n"
+                                        "    background-color: rgb" + self.mainColor + ";\n"
+                                        "}")
+        self.addKeyButton.setIcon(icon)
+        self.addKeyButton.setObjectName("addKeyButton")
+        self.buttonsWidgetLayout.addWidget(self.addKeyButton, 2, 0, 1, 1)
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        self.pushButton.setFont(font)
-        self.pushButton.setIcon(icon)
-        self.pushButton.setCheckable(False)
-        self.pushButton.setChecked(False)
-        self.pushButton.setObjectName("pushButton")
-        self.gridLayout_2.addWidget(self.pushButton, 1, 2, 1, 1)
-        self.pushButton_2 = QtWidgets.QPushButton(self.frame)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.analiseButton.setFont(font)
+        self.analiseButton.setStyleSheet("QPushButton {\n"
+                                         "    border: 2px solid;\n"
+                                         "     border-radius: 10px;\n"
+                                         "    background-color: rgb" + self.secondaryColor + ";\n"
+                                         "    padding-right: 20px;\n"
+                                         "    padding-left: 20px;\n"
+                                         "}\n"
+                                         "QPushButton:hover {\n"
+                                         "    background-color: rgb" + self.mainColor + ";\n"
+                                         "}")
+        self.analiseButton.setIcon(icon)
+        self.analiseButton.setCheckable(False)
+        self.analiseButton.setChecked(False)
+        self.analiseButton.setObjectName("analiseButton")
+        self.buttonsWidgetLayout.addWidget(self.analiseButton, 1, 0, 1, 1)
         font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        self.pushButton_2.setFont(font)
-        self.pushButton_2.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.pushButton_2.setIcon(icon)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.gridLayout_2.addWidget(self.pushButton_2, 2, 2, 1, 1)
-        self.pushButton_3 = QtWidgets.QPushButton(self.frame)
-        font = QtGui.QFont()
-        font.setFamily("Cascadia Mono")
-        self.pushButton_3.setFont(font)
-        self.pushButton_3.setIcon(icon)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.gridLayout_2.addWidget(self.pushButton_3, 3, 2, 1, 1)
-        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.createGraphicsButton.setFont(font)
+        self.createGraphicsButton.setStyleSheet("QPushButton {\n"
+                                                "    border: 2px solid;\n"
+                                                "     border-radius: 10px;\n"
+                                                "    background-color: rgb" + self.secondaryColor + ";\n"
+                                                "    padding-right: 20px;\n"
+                                                "    padding-left: 20px;\n"
+                                                "}\n"
+                                                "QPushButton:hover {\n"
+                                                "    background-color: rgb" + self.mainColor + ";\n"
+                                                "}")
+        self.createGraphicsButton.setIcon(icon)
+        self.createGraphicsButton.setObjectName("createGraphicsButton")
+        self.buttonsWidgetLayout.addWidget(self.createGraphicsButton, 3, 0, 1, 1)
+        self.generalGridLayout.addWidget(self.buttonsWidget, 1, 3, 1, 1)
+        self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
 
         self.translateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
-        self.pushButton_2.setEnabled(False)
-        self.pushButton.setEnabled(False)
-        self.pushButton_3.setEnabled(False)
-
-        self.downloadButton.clicked.connect(lambda: self.findKeyWords())
-        self.pushButton_2.clicked.connect(lambda: self.addNewKey())
-        self.pushButton.clicked.connect(lambda: self.makeAnalise())
-        self.pushButton_3.clicked.connect(lambda: self.goToGraphicWidgetPanel())
+        self.findKeysButton.clicked.connect(lambda: self.findKeyWords(1))
+        self.addKeyButton.clicked.connect(lambda: self.addNewKey())
+        self.analiseButton.clicked.connect(lambda: self.makeAnalise())
+        self.createGraphicsButton.clicked.connect(lambda: self.goToGraphicWidgetPanel())
         self.tableWidget.cellChanged.connect(self.changeItemState)
         self.tableWidget.cellClicked.connect(self.deleteItem)
 
-    def goToGraphicWidgetPanel(self):
-        graphicsView = QtWidgets.QWidget(self.centralWidget)
-        controller = GraphicWidgetPanel.GraphicWidgetPanel(graphicsView, self.centralWidget, self.MainWindow,
-                                                           self.ProjectDirectory)
-        self.MainWindow.gridLayout.addWidget(controller.Form)
-        graphicsView.show()
-        self.Form.close()
+        self.initialStateDefined()
+        self.movie.start()
 
-    def deleteItem(self,  row, column):
+    def initialStateDefined(self):
+        if exists(self.keyExtractionFolder):
+            if exists(self.keyListFilePath) and exists(self.relationFilePath) and exists(self.uniqueKeysFilePath) and \
+                    exists(self.matrixAnalysisFile) and exists(self.finalDocumentPath):
+                self.findKeyWords(3)
+            else:
+                if exists(self.keyListFilePath):
+                    self.findKeyWords(2)
+                    self.createGraphicsButton.setEnabled(False)
+                else:
+                    self.addKeyButton.setEnabled(False)
+                    self.analiseButton.setEnabled(False)
+                    self.createGraphicsButton.setEnabled(False)
+        else:
+            self.addKeyButton.setEnabled(False)
+            self.analiseButton.setEnabled(False)
+            self.createGraphicsButton.setEnabled(False)
+
+    def goToGraphicWidgetPanel(self):
+        self.MainWindow.controller.goToPanel(4)
+
+    def deleteItem(self, row, column):
         column = int(column)
         if column == 0:
             self.tableWidget.removeRow(row)
@@ -187,15 +277,12 @@ class KeyWordsWidgetPanel(object):
         item.setFlags(QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled)
         self.tableWidget.setItem(0, 2, item)
 
-    def chargeData(self):
-        if exists(self.keyExtractionFolder):
-            print(11)
-
     def makeAnalise(self):
         allTableWithData = True
         dataToAnalise = []
+        changeState = True
 
-        for row in range(0, self.tableWidget.rowCount()-1):
+        for row in range(0, self.tableWidget.rowCount() - 1):
 
             key = self.tableWidget.item(row, 1).text()
             key = key.replace(' ', '')
@@ -220,57 +307,127 @@ class KeyWordsWidgetPanel(object):
                 break
 
         if allTableWithData:
-            for row in range(0, self.tableWidget.rowCount()-1):
+            for row in range(0, self.tableWidget.rowCount() - 1):
                 relation = [self.tableWidget.item(row, 1).text(), self.tableWidget.item(row, 2).text()]
                 dataToAnalise.append(relation)
 
-            if not exists(self.keyExtractionFolder):
+            if exists(self.keyExtractionFolder):
+                if exists(self.keyListFilePath) and exists(self.relationFilePath) and exists(
+                        self.uniqueKeysFilePath) and exists(self.matrixAnalysisFile) and exists(self.finalDocumentPath):
+                    dialog = QtWidgets.QDialog(self.centralWidget)
+                    controller = DialogWidget.DialogWidget(dialog, "apa", "iap")
+                    dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+                    dialog.exec_()
+
+                    if not controller.state:
+                        changeState = False
+            else:
                 os.mkdir(self.keyExtractionFolder)
 
-            rake_Analysis.writeRelationCSV(self.relationFilePath, dataToAnalise)
-            time.sleep(1)
-            rake_Analysis.allAnalysis(self.relationFilePath, self.downloadedFilesFolder, self.uniqueKeysFilePath,
-                                      self.matrixAnalysisFile, self.finalDocumentPath, self.stopPathFile)
+            if changeState:
+                loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges(True))
 
-            self.pushButton_3.setEnabled(True)
+                self.thread = AnalyseDocuments.AnalyseDocuments(dataToAnalise, self.downloadFilesFolder,
+                                                                self.stopPathFile, self.relationFilePath,
+                                                                self.uniqueKeysFilePath,
+                                                                self.matrixAnalysisFile, self.finalDocumentPath)
+                self.thread.successful_Action.connect(lambda: self.allCorrect())
+                loadView.start()
+                self.thread.start()
 
-    def findKeyWords(self):
+    def allCorrect(self):
+        self.findKeysButton.setEnabled(True)
+        self.addKeyButton.setEnabled(True)
+        self.analiseButton.setEnabled(True)
+        self.createGraphicsButton.setEnabled(True)
+        self.gifChargingLabel.clear()
 
+    def findKeyWords(self, typology):
+
+        changeState = True
         self.state = 0
+        data = ''
 
-        if not exists(self.keyExtractionFolder):
-            os.mkdir(self.keyExtractionFolder)
+        if typology == 1:
+            if exists(self.keyListFilePath):
+                dialog = QtWidgets.QDialog(self.centralWidget)
+                controller = DialogWidget.DialogWidget(dialog, "apa", "iap")
+                dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+                dialog.exec_()
+                if not controller.state:
+                    changeState = False
+            if changeState:
+                if not exists(self.keyExtractionFolder):
+                    os.mkdir(self.keyExtractionFolder)
 
-        data = rake_Analysis.writeListKey(self.downloadedFilesFolder, self.keyListFilePath, self.stopPathFile)
+        loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges(False))
 
-        self.tableWidget.setRowCount(len(data))
+        if changeState:
+            self.thread = FindKeyWords.FindKeyWords(typology, data, self.downloadFilesFolder, self.keyListFilePath,
+                                                    self.stopPathFile, self.relationFilePath)
+            self.thread.successful_Action.connect(
+                lambda: self.successful_Action(changeState, self.thread.data, typology))
+            loadView.start()
+            self.thread.start()
 
-        rowNumber = 0
-        for iterator in data:
+    def GUIActionChanges(self, typology):
+        self.gifChargingLabel.clear()
+        self.gifChargingLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.gifChargingLabel.setMovie(self.movie)
+        if typology:
+            self.tableWidget.clearContents()
+        self.findKeysButton.setEnabled(False)
+        self.analiseButton.setEnabled(False)
+        self.addKeyButton.setEnabled(False)
+        self.createGraphicsButton.setEnabled(False)
+        self.translateUi(self.Form)
 
-            item = QtWidgets.QTableWidgetItem()
-            item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignBottom)
-            icon = QtGui.QIcon()
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
-            icon.addPixmap(QtGui.QPixmap("./Resources/img/incorrect_delete_icon.png"), QtGui.QIcon.Normal,
-                           QtGui.QIcon.Off)
-            item.setIcon(icon)
-            item.setBackground(QtGui.QColor(255, 255, 255))
-            self.tableWidget.setItem(rowNumber, 0, item)
+    def successful_Action(self, changeState, data, typology):
 
-            item = QtWidgets.QTableWidgetItem()
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
-            item.setText(str(iterator))
-            self.tableWidget.setItem(rowNumber, 1, item)
+        if changeState:
+            self.tableWidget.setRowCount(len(data))
 
-            item = QtWidgets.QTableWidgetItem()
-            item.setFlags(QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled)
-            self.tableWidget.setItem(rowNumber, 2, item)
+            rowNumber = 0
+            for iterator in data:
 
-            rowNumber = rowNumber + 1
-        self.state = 1
-        self.pushButton_2.setEnabled(True)
-        self.pushButton.setEnabled(True)
+                item = QtWidgets.QTableWidgetItem()
+                item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignBottom)
+                icon = QtGui.QIcon()
+                item.setFlags(QtCore.Qt.ItemIsEnabled)
+                icon.addPixmap(QtGui.QPixmap("./Resources/img/incorrect_delete_icon.png"), QtGui.QIcon.Normal,
+                               QtGui.QIcon.Off)
+                item.setIcon(icon)
+                item.setText('')
+                item.setBackground(QtGui.QColor(255, 255, 255))
+                self.tableWidget.setItem(rowNumber, 0, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setFlags(QtCore.Qt.ItemIsEnabled)
+
+                if typology != 3:
+                    item.setText(str(iterator))
+                else:
+                    item.setText(str(iterator))
+
+                self.tableWidget.setItem(rowNumber, 1, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setFlags(QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled)
+
+                if typology == 3:
+                    item.setText(str(data.get(iterator)))
+
+                self.tableWidget.setItem(rowNumber, 2, item)
+
+                rowNumber = rowNumber + 1
+            self.state = 1
+            self.addKeyButton.setEnabled(True)
+            self.analiseButton.setEnabled(True)
+            self.gifChargingLabel.clear()
+            self.findKeysButton.setEnabled(True)
+
+            if typology == 3:
+                self.createGraphicsButton.setEnabled(True)
 
     def translateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
@@ -280,10 +437,10 @@ class KeyWordsWidgetPanel(object):
         item.setText(_translate("Form", "KeyWord"))
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("Form", "Self kew"))
-        self.downloadButton.setText(_translate("Form", "Find KeyWord"))
-        self.downloadButton.setShortcut(_translate("Form", "Ctrl+F"))
-        self.pushButton.setText(_translate("Form", "Analise"))
-        self.pushButton.setShortcut(_translate("Form", "Ctrl+A"))
-        self.pushButton_2.setText(_translate("Form", "Add KeyWord"))
-        self.pushButton_2.setShortcut(_translate("Form", "Ctrl+K"))
-        self.pushButton_3.setText(_translate("Form", "Create Graphics"))
+        self.findKeysButton.setText(_translate("Form", "Find KeyWord"))
+        self.findKeysButton.setShortcut(_translate("Form", "Ctrl+F"))
+        self.analiseButton.setText(_translate("Form", "Analise"))
+        self.analiseButton.setShortcut(_translate("Form", "Ctrl+A"))
+        self.addKeyButton.setText(_translate("Form", "Add KeyWord"))
+        self.addKeyButton.setShortcut(_translate("Form", "Ctrl+K"))
+        self.createGraphicsButton.setText(_translate("Form", "Create Graphics"))
