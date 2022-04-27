@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>882</width>
+    <height>782</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="minimumSize">
+      <size>
+       <width>600</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>Cascadia Mono</family>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">alternate-background-color: rgb(85, 255, 255);
+font: 9pt &quot;Cascadia Mono&quot;;</string>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>30</number>
+     </attribute>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string notr="true"/>
+      </property>
+      <property name="background">
+       <color>
+        <red>85</red>
+        <green>170</green>
+        <blue>255</blue>
+       </color>
+      </property>
+      <property name="foreground">
+       <brush brushstyle="NoBrush">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>KeyWord</string>
+      </property>
+      <property name="background">
+       <color>
+        <red>85</red>
+        <green>170</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Self kew</string>
+      </property>
+      <property name="background">
+       <color>
+        <red>85</red>
+        <green>170</green>
+        <blue>255</blue>
+       </color>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="1">
+       <widget class="QWidget" name="labelWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="gifChargingLabel">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <spacer name="horizontalSpacerLeft">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0">
+       <spacer name="spacerItemRight">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="3">
+       <widget class="QWidget" name="buttonsWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="QPushButton" name="findKeysButton">
+           <property name="font">
+            <font>
+             <family>Cascadia Mono</family>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+           </property>
+           <property name="text">
+            <string>Find KeyWord</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>bitmap.png</normaloff>bitmap.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+F</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="addKeyButton">
+           <property name="font">
+            <font>
+             <family>Cascadia Mono</family>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+           </property>
+           <property name="text">
+            <string>Add KeyWord</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>bitmap.png</normaloff>bitmap.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+K</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="analiseButton">
+           <property name="font">
+            <font>
+             <family>Cascadia Mono</family>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+           </property>
+           <property name="text">
+            <string>Analise</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>bitmap.png</normaloff>bitmap.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+A</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="createGraphicsButton">
+           <property name="font">
+            <font>
+             <family>Cascadia Mono</family>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+           </property>
+           <property name="text">
+            <string>Create Graphics</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>bitmap.png</normaloff>bitmap.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

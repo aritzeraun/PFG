@@ -1,5 +1,7 @@
 import threading
 import configparser
+import time
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QMessageBox
@@ -14,6 +16,7 @@ class LoginWidgetPanel(object):
         self.Form = Form
         self.MainWindow = MainWindow
         self.centralWidget = CentralWidget
+
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.widget = QtWidgets.QWidget(Form)
         self.gridLayout_2 = QtWidgets.QGridLayout(self.widget)
@@ -24,7 +27,7 @@ class LoginWidgetPanel(object):
         self.passwordField = QtWidgets.QLineEdit(self.widget)
         self.usernameField = QtWidgets.QLineEdit(self.widget)
 
-        self.movie = QMovie("./GUI/process.gif")
+        self.movie = QMovie("./Resources/img/process_running_gif.gif")
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
         self.config = configparser.RawConfigParser()
@@ -204,7 +207,7 @@ class LoginWidgetPanel(object):
         self.msgBoxDomain.setText(self.config.get('LoginWidgetPanelSection', 'messageBox_alert_domainError_text'))
 
         # change view language statements
-        self.translateUi(Form)
+        self.translateUi()
         QtCore.QMetaObject.connectSlotsByName(Form)
 
         # change view to saved configuration values
@@ -224,6 +227,8 @@ class LoginWidgetPanel(object):
         self.MainWindow.gridLayout.addWidget(cont.Form)
         searchView.show()
         self.Form.close()
+        self.MainWindow.visibleForm = searchView
+        self.MainWindow.dockWidget.setEnabled(True)
 
     def thread_authentication_error(self):
         self.loadBox.clear()
@@ -231,6 +236,7 @@ class LoginWidgetPanel(object):
         self.usernameField.setEnabled(True)
         self.passwordField.setEnabled(True)
         self.accessButton.setEnabled(True)
+        self.MainWindow.dockWidget.setEnabled(True)
 
         msgBoxLogin = QMessageBox()
         msgBoxLogin.setText(self.config.get('LoginWidgetPanelSection', 'messageBox_alert_loginError_text'))
@@ -244,6 +250,8 @@ class LoginWidgetPanel(object):
         self.usernameField.setEnabled(False)
         self.passwordField.setEnabled(False)
         self.accessButton.setEnabled(False)
+        time.sleep(0.5)
+        self.MainWindow.dockWidget.setEnabled(False)
 
     def accessButton_clicked_or_returnPressed(self):
         # takes values introduced
@@ -266,9 +274,10 @@ class LoginWidgetPanel(object):
         else:
             self.msgBoxDomain.exec()
 
-    def translateUi(self, Form):
+    def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
         # set text of item depending to the selected languages
         self.usernameField.setPlaceholderText(_translate("MainWindow", str(
                                                          self.config.get('LoginWidgetPanelSection',

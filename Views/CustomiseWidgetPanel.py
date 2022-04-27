@@ -212,7 +212,7 @@ class CustomiseWidgetPanel(object):
         self.fontSizeBox.editingFinished.connect(lambda: self.configChanges())
         self.fontComboBox.activated.connect(lambda: self.configChanges())
         self.styleBox.activated.connect(lambda: self.configChanges())
-        self.languagesComboBox.activated.connect(lambda: self.configChanges())
+        self.languagesComboBox.currentTextChanged.connect(lambda: self.configChanges())
 
         # Toggle definitions
         self.themeToggle.setMaximumSize(QtCore.QSize(80, 16777215))
@@ -237,10 +237,13 @@ class CustomiseWidgetPanel(object):
 
     def adaptViewToConfigurationSetting(self):
 
-        for i in range(0, self.languagesComboBox.count()-1):
-            self.languagesComboBox.setCurrentIndex(i)
-            if self.languagesComboBox.currentText() == self.configGeneral.get('SYSTEM', 'language_code'):
-                break
+        self.MainWindow.translateUi()
+        if self.configGeneral.get('SYSTEM', 'language_code') == 'EN':
+            self.languagesComboBox.setCurrentIndex(0)
+        elif self.configGeneral.get('SYSTEM', 'language_code') == 'ES':
+            self.languagesComboBox.setCurrentIndex(1)
+        elif self.configGeneral.get('SYSTEM', 'language_code') == 'EUS':
+            self.languagesComboBox.setCurrentIndex(2)
 
         if self.configGeneral.get('SYSTEM', 'accessibility_default') == 'True':
             self.accessibilityToggle.setChecked(True)
@@ -319,12 +322,11 @@ class CustomiseWidgetPanel(object):
     def configChanges(self):
 
         configFileWriter = ConfigurationFileWriter.ConfigurationFileWriter()
-
         configFileWriter.configFileWriter(self.languagesComboBox.currentText(), self.accessibilityToggle.isChecked(),
                                           self.fontComboBox.currentText(), self.fontSizeBox.text(),
                                           self.themeToggle.isChecked(), self.styleBox.currentText(),
                                           self.mainColorButton.objectName(), self.secondaryColorButton.objectName())
-        print(11)
+
         if self.state != 'init':
 
             CustomiseView = QtWidgets.QWidget(self.central)
@@ -358,6 +360,10 @@ class CustomiseWidgetPanel(object):
         self.state = 'second'
 
     def translateUi(self, Form):
+
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
+
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.languageLabel.setText(_translate("Form", str(self.config.get('CustomiseWidgetPanelSection',

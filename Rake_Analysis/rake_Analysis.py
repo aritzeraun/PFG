@@ -58,7 +58,7 @@ def writeKeyListFile(downloadedFilesFolder, keyListFilePath, rake_object):
     f.close()
 
 
-def writeUniqueKeysFile(downloadedFilesFolder, uniqueKeyListFilePath, rake_object,wordsDict):
+def writeUniqueKeysFile(downloadedFilesFolder, uniqueKeyListFilePath, rake_object, wordsDict):
     f = open(uniqueKeyListFilePath, "w+", encoding="iso-8859-1")
     for file in listdir(downloadedFilesFolder):
         sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
@@ -174,18 +174,22 @@ def readKeysListFile(path):
     return WordDictionary
 
 
-def writeListKey(downloadedFilesFolder, pathKeysFile, stopPath):
-    rake_object = rake.Rake(stopPath, 3, 8, 6)
+def writeListKey(downloadedFilesFolder, pathKeysFile, stopPath, min_char_length, min_phrase_freq_adj,
+                 min_keyword_frequency):
+
+    rake_object = rake.Rake(stopPath, min_char_length=min_char_length, min_keyword_frequency=min_phrase_freq_adj,
+                            min_phrase_freq_adj=min_keyword_frequency)
     writeKeyListFile(downloadedFilesFolder, pathKeysFile, rake_object)
     # writeKeyFile(downloadedFilesFolder, pathKeysFile, rake_object)
     keysArray = readKeysListFile(pathKeysFile)
     return keysArray
 
 
-def allAnalysis(keyWordsFile, downloadedFilesFolder, uniqueKeysFilePath, matrixAnalysisFile, finalDocumentPath,
-                stopPath):
-    rake_object = rake.Rake(stopPath, 3, 8, 6)
+def allAnalysis(keyWordsFile, downloadedFilesFolder, uniqueKeysFilePath, stopPath, min_char_length, min_phrase_freq_adj,
+                min_keyword_frequency):
+    rake_object = rake.Rake(stopPath, min_char_length=min_char_length, min_keyword_frequency=min_phrase_freq_adj,
+                            min_phrase_freq_adj=min_keyword_frequency)
     wordsDict = readCSVFile(keyWordsFile)
     writeUniqueKeysFile(downloadedFilesFolder, uniqueKeysFilePath, rake_object, wordsDict)
-    writeMatrix(downloadedFilesFolder, matrixAnalysisFile, rake_object)
-    documentStandardization(finalDocumentPath, matrixAnalysisFile)
+    # writeMatrix(downloadedFilesFolder, matrixAnalysisFile, rake_object)
+    # documentStandardization(finalDocumentPath, matrixAnalysisFile)

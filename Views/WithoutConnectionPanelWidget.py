@@ -1,10 +1,8 @@
 import configparser
-from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
 from Connecttion import IntenetConnection
-from Views import LoginWidgetPanel
 
 
 class WithoutConnectionPanelWidget(object):
@@ -113,30 +111,30 @@ class WithoutConnectionPanelWidget(object):
         self.gridLayout.addItem(spacerItem4, 5, 1, 1, 1)
 
         self.buttonTryAgain.clicked.connect(lambda: self.verifyConnection())
+        self.MainWindow.dockWidget.setEnabled(False)
 
         self.translateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def verifyConnection(self):
         if IntenetConnection.connectionToEthernet():
-            LoginView = QtWidgets.QWidget(self.centralWidget)
-            controller = LoginWidgetPanel.LoginWidgetPanel(LoginView, self.centralWidget, self)
-            self.MainWindow.gridLayout.addWidget(controller.Form)
-            LoginView.show()
-            self.Form.close()
+
+            self.MainWindow.controller.goToPanel(1)
+            self.MainWindow.dockWidget.setEnabled(True)
+
             msgBoxLogin = QMessageBox()
-            msgBoxLogin.setText(self.config.get('WithoutConnectionPanelSection',
-                                                'messageBox_alert_successful_connection_text'))
-            msgBoxLogin.setAlignment(Qt.AlignJustify)
+            msgBoxLogin.setText(str(self.config.get('WithoutConnectionPanelSection',
+                                                    'messageBox_alert_successful_connection_text')))
             msgBoxLogin.exec()
         else:
             msgBoxLogin = QMessageBox()
             msgBoxLogin.setText(self.config.get('WithoutConnectionPanelSection',
                                                 'messageBox_alert_without_connection_text'))
-            msgBoxLogin.setAlignment(Qt.AlignJustify)
             msgBoxLogin.exec()
 
     def translateUi(self, Form):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.first_recommendation_label.setText(_translate("Form", self.config.get('WithoutConnectionPanelSection',

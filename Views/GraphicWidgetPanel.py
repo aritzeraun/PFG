@@ -50,7 +50,7 @@ class GraphicWidgetPanel(object):
         self.keyExtractionFolder = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
                                                                                      'analysis_folder_name') + '/'
         self.matrixAnalysisFile = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
-                                                                                    'matrix_analysis_file_name')
+                                                                                    'unique_keys_file_name')
 
         self.font = self.configGeneral.get('SYSTEM', 'accessibility_current_font')
         self.fontSize = int(self.configGeneral.get('SYSTEM', 'accessibility_current_font_size'))
@@ -190,13 +190,12 @@ class GraphicWidgetPanel(object):
             self.typeOfGraphicCombo.setEnabled(False)
 
     def changeImageOfLabel(self):
-        pixmap_image = ''
         self.graphicLabel.clear()
 
-        if 'Graph ' in self.typeOfGraphicCombo.currentText():
-            pixmap_image = QtGui.QPixmap(self.graphImageName)
-        elif 'Circular' in self.typeOfGraphicCombo.currentText():
+        if 'ular' in self.typeOfGraphicCombo.currentText():
             pixmap_image = QtGui.QPixmap(self.circularImageName)
+        else:
+            pixmap_image = QtGui.QPixmap(self.graphImageName)
 
         pixmap_image.scaled(1000, 1000, QtCore.Qt.KeepAspectRatio)
 
@@ -209,6 +208,7 @@ class GraphicWidgetPanel(object):
     def loadViewThread(self):
         # change login view
         self.graphicLabel.clear()
+        self.MainWindow.dockWidget.setEnabled(False)
         self.graphicLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.graphicLabel.setMovie(self.movie)
         self.typeOfGraphicCombo.setEnabled(False)
@@ -230,13 +230,12 @@ class GraphicWidgetPanel(object):
         self.heightLabel.setEnabled(True)
         self.heightSpinBox.setEnabled(True)
         self.createGraphicButton.setEnabled(True)
+        self.MainWindow.dockWidget.setEnabled(True)
 
-        pixmap_image = ''
-
-        if 'Graph' in self.typeOfGraphicCombo.currentText():
-            pixmap_image = QtGui.QPixmap(self.graphImageName)
-        elif 'Circular' in self.typeOfGraphicCombo.currentText():
+        if 'ular' in self.typeOfGraphicCombo.currentText():
             pixmap_image = QtGui.QPixmap(self.circularImageName)
+        else:
+            pixmap_image = QtGui.QPixmap(self.graphImageName)
 
         self.graphicLabel.setPixmap(pixmap_image)
         self.graphicLabel.setAlignment(QtCore.Qt.AlignCenter)
@@ -287,19 +286,16 @@ class GraphicWidgetPanel(object):
 
     def exportImageResult(self):
 
-        source = ''
-        if 'Graph' in self.typeOfGraphicCombo.currentText():
+        if 'ular ' in self.typeOfGraphicCombo.currentText():
             source = self.graphImageName
-        elif 'Circular' in self.typeOfGraphicCombo.currentText():
+        else:
             source = self.circularImageName
 
         if exists(self.GraphicsFolder) and exists(source):
 
             options = QFileDialog.Options()
-            folder = QFileDialog.getSaveFileName(None, str(self.config.get('GraphViewSection', 'file_dialog_title'))
-                                                 .encode('ansi'), "",
-                                                 "JPG (*.jpg);;PNG (*.png);; PDF (*.pdf)", options=options)
-
+            folder = QFileDialog.getSaveFileName(None, str(self.config.get('GraphViewSection', 'file_dialog_title')),
+                                                 "", "JPG (*.jpg);;PNG (*.png);; PDF (*.pdf)", options=options)
             if 'JPG' in folder[1]:
                 shutil.copy(source, str(folder[0]))
             elif 'PNG' in folder[1]:
@@ -315,6 +311,8 @@ class GraphicWidgetPanel(object):
             ErrorBox.exec()
 
     def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
         self.createGraphicButton.setText(_translate("Form",
                                                     str(self.config.get('GraphViewSection',

@@ -153,6 +153,8 @@ class WelcomeView(object):
             self.sectionViews = licenseViewController.Form
 
     def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
         self.AppNameLabel.setText(_translate("MainWindow", "  SpyDocument\n"
                                                            "  v2022.1"))

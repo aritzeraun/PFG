@@ -6,6 +6,7 @@ import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
@@ -21,7 +22,7 @@ class Connections:
         ROOT_DIR = os.path.abspath(os.curdir)
         ROOT_DIR = ROOT_DIR + '\Downloads'
         op = webdriver.ChromeOptions()
-        # op.add_argument('--headless')
+        op.add_argument('--headless')
         op.add_argument('--start-maximized')
         op.add_argument('--disable-extensions')
         prefs = {'download.default_directory': ROOT_DIR}
@@ -53,28 +54,44 @@ class Connections:
         except TimeoutException:
             return True
 
-    def dataSearch(self, topic):
-        self.driver.get(self.URL)
+    def dataSearch(self, topic, search_error):
 
-        WebDriverWait(self.driver, 15).until(
-            ec.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler'.replace(' ', '.')))).click()
+        if not search_error:
+            self.driver.get(self.URL)
+
+        try:
+            WebDriverWait(self.driver, 10).until(
+                ec.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler'.replace(' ', '.')))).click()
+        except TimeoutException:
+            print("")
 
         self.driver.find_element(By.XPATH, '//*[@id="mat-input-0"]').send_keys(topic)
 
         try:
-            WebDriverWait(self.driver, 8).until(ec.presence_of_element_located(
-                (By.XPATH, '//*[@id="snSearchType"]/div[1]/b')))
-            print("todo ok")
-            return False
-        except TimeoutException:
-            # select the data base of source
             WebDriverWait(self.driver, 5).until(
-                ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button'.replace(' ', '.')))).click()
-            WebDriverWait(self.driver, 5).until(
-                ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button/span[1]'.replace(' ', '.')))).click()
+                ec.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/div/div/div[3]/div/button'))).click()
+        except Exception:
+            print("")
 
+        # select the data base of source
+        WebDriverWait(self.driver, 5).until(
+            ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button'.replace(' ', '.')))).click()
+        WebDriverWait(self.driver, 5).until(
+            ec.element_to_be_clickable((By.XPATH, '//*[@id="snSelectDb"]/button/span[1]'.replace(' ', '.')))).click()
+
+        try:
             WebDriverWait(self.driver, 5).until(ec.element_to_be_clickable(
                 (By.XPATH, '//*[@id="snSearchType"]/div[3]/button[2]'.replace(' ', '.')))).click()
+        except Exception:
+            self.driver.find_element(By.XPATH, '//*[@id="mat-input-0"]').send_keys(Keys.ENTER)
+
+        try:
+            WebDriverWait(self.driver, 8).until(ec.presence_of_element_located(
+                (By.XPATH, '//*[@id="snSearchType"]/div[1]/b')))
+            WebDriverWait(self.driver, 5).until(
+                ec.element_to_be_clickable((By.XPATH, '//*[@id="snSearchType"]/div[4]/button[1]'))).click()
+            return False
+        except TimeoutException:
 
             number_of_results = WebDriverWait(self.driver, 20).until(
                 ec.visibility_of_element_located((By.XPATH,

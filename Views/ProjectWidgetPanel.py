@@ -1,5 +1,6 @@
 import configparser
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 
 from Logic import CreateNewProject, OpenProject, RecentProject
 
@@ -215,6 +216,7 @@ class ProjectWidgetPanel(object):
         self.tableWidget.horizontalHeader().setSortIndicatorShown(False)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(25)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
 
         self.mainWidget.addWidget(self.tableWidget, 9, 1, 1, 1)
@@ -236,6 +238,7 @@ class ProjectWidgetPanel(object):
         self.mainWidget.addWidget(self.recentProjects_label, 8, 1, 1, 1)
         self.gridLayout.addLayout(self.mainWidget, 0, 0, 1, 1)
         self.gridLayout_2.addWidget(self.sectionViews, 0, 0, 1, 1)
+        self.tableWidget.setColumnWidth(0, 185)
 
         self.translateUi()
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -260,15 +263,18 @@ class ProjectWidgetPanel(object):
                     break
 
                 itemProjectName = QtWidgets.QTableWidgetItem(projectName)
+                itemProjectName.setTextAlignment(Qt.AlignHCenter)
                 itemProjectName.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.tableWidget.setItem(int(i-1), 0, itemProjectName)
 
                 itemAccess = QtWidgets.QTableWidgetItem(projectLastAccess)
+                itemAccess.setTextAlignment(Qt.AlignHCenter)
                 itemAccess.setFlags(QtCore.Qt.ItemIsEnabled)
                 self.tableWidget.setItem(int(i-1), 1, itemAccess)
 
                 itemLocation = QtWidgets.QTableWidgetItem(projectLocation)
                 itemLocation.setFlags(QtCore.Qt.ItemIsEnabled)
+                itemLocation.setTextAlignment(Qt.AlignHCenter)
                 self.tableWidget.setItem(int(i-1), 2, itemLocation)
 
                 projectData = [projectName, projectLastAccess, projectLocation]
@@ -295,6 +301,8 @@ class ProjectWidgetPanel(object):
                                                           'messageBox_project_already_exists_message'))
 
     def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
         self.slogan_second_line.setText(_translate("Form", str(self.config.get('ProjectWidgetPanelSection',
                                                                                'app_slogan_second_line_label_text'))

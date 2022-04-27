@@ -4,8 +4,9 @@ import shutil
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-from Logic import CreateNewProject, OpenProject, RecentProject, RenameProject, ChangeLocation, RecentProjectFileWriter
-from Views import LoginWidgetPanel, LicenseWidgetPanel, DockWidgetPanel, WelcomeView
+from Logic import CreateNewProject, OpenProject, RecentProject, RenameProject, ChangeLocation, \
+    RecentProjectFileWriter, ConfigurationFileWriter
+from Views import LicenseWidgetPanel, DockWidgetPanel, WelcomeView
 
 
 class ApplicationView:
@@ -26,7 +27,7 @@ class ApplicationView:
         self.menuSettings = QtWidgets.QMenu(self.menuBar)
         self.menuLanguage = QtWidgets.QMenu(self.menuSettings)
         self.menuProject_2 = QtWidgets.QMenu(self.menuBar)
-        self.menuHelp = QtWidgets.QMenu(self.menuBar)
+        self.menuHelp = QtWidgets.QAction(MainWindow)
         self.menuViews = QtWidgets.QMenu(self.menuBar)
         self.statusBar = QtWidgets.QStatusBar(MainWindow)
         self.dockWidget = QtWidgets.QDockWidget(MainWindow)
@@ -59,7 +60,8 @@ class ApplicationView:
         self.mainColor = self.configGeneral.get('SYSTEM', 'theme_current_main_color')
         self.secondaryColor = self.configGeneral.get('SYSTEM', 'theme_current_secondary_color')
 
-        self.visibleForm = None
+        self.visibleForm = QtWidgets.QWidget(self.centralWidget)
+        self.controller = None
         self.setupUi(self.MainWindow)
 
     def setupUi(self, MainWindow):
@@ -77,6 +79,9 @@ class ApplicationView:
         self.menuSettings.setObjectName("menuSettings")
         self.menuLanguage.setObjectName("menuLanguage")
         self.menuProject_2.setObjectName("menuProject_2")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap('./Resources/img/help_button_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.menuHelp.setIcon(icon)
         self.menuHelp.setObjectName("menuHelp")
         self.menuViews.setObjectName("menuViews")
         MainWindow.setMenuBar(self.menuBar)
@@ -87,9 +92,12 @@ class ApplicationView:
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.dockWidget.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidget)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap('./Resources/img/new_project_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionNew_Project.setIcon(icon)
         self.actionNew_Project.setObjectName("actionNew_Project")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("deusto.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap('./Resources/img/folder_open_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionOpen.setIcon(icon)
         self.actionOpen.setObjectName("actionOpen")
         self.actionExit.setObjectName("actionExit")
@@ -109,7 +117,6 @@ class ApplicationView:
         self.actionProgress_View.setChecked(True)
         self.actionProgress_View.setObjectName("actionProgress_View")
         self.menuOpen_Recent.addSeparator()
-
         self.menuProject.addAction(self.actionNew_Project)
         self.menuProject.addAction(self.actionOpen)
         self.menuProject.addAction(self.menuOpen_Recent.menuAction())
@@ -125,12 +132,12 @@ class ApplicationView:
         self.menuProject_2.addSeparator()
         self.menuProject_2.addAction(self.actionClose_Project)
         self.menuProject_2.addAction(self.actionDelete_Project)
+        self.menuSettings.addAction(self.menuHelp)
         self.menuViews.addAction(self.actionProgress_View)
         self.menuBar.addAction(self.menuProject.menuAction())
         self.menuBar.addAction(self.menuProject_2.menuAction())
         self.menuBar.addAction(self.menuViews.menuAction())
         self.menuBar.addAction(self.menuSettings.menuAction())
-        self.menuBar.addAction(self.menuHelp.menuAction())
 
         self.actionExit.triggered.connect(lambda: self._actionExit())
         self.actionNew_Project.triggered.connect(lambda: self._createNewProject())
@@ -141,16 +148,26 @@ class ApplicationView:
         self.actionChange_Location.triggered.connect(lambda: self._changeLocation())
         self.actionDelete_Project.triggered.connect(lambda: self._deleteProject())
         self.actionClose_Project.triggered.connect(lambda: self._closeProject())
+        self.menuHelp.triggered.connect(lambda: self._showHelpMessage())
+        self.actionEN.triggered.connect(lambda: self._changeLanguage('EN'))
+        self.actionES.triggered.connect(lambda: self._changeLanguage('ES'))
+        self.actionEUS.triggered.connect(lambda: self._changeLanguage('EUS'))
 
-        self.actionExit.setShortcut("Ctrl+N")
+        self.actionExit.setShortcut("Ctrl+E")
+        self.actionNew_Project.setShortcut("Ctrl+N")
+        self.actionOpen.setShortcut("Ctrl+O")
+        self.menuHelp.setShortcut("Ctrl+M")
+        self.actionLicense.setShortcut("Ctrl+L")
+        self.actionChange_Location.setShortcut("Ctrl+D")
+        self.actionClose_Project.setShortcut("Ctrl+C")
+
         self.controller = DockWidgetPanel.DockWidgetPanel(QtWidgets.QWidget(), self.centralWidget, self,
-                                                     self.projectDirectory)
+                                                          self.projectDirectory)
         self.dockWidget.setWidget(self.controller.Form)
 
         self.translateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self._setRecentProjectName()
-        self.menuHelp.addAction(self._showHelpMessage())
 
     def _deleteProject(self):
         print(self.projectDirectory)
@@ -195,6 +212,13 @@ class ApplicationView:
         else:
             self.dockWidget.close()
 
+    def _changeLanguage(self, language):
+
+        ConfigurationFileWriter.ConfigurationFileWriter().changeLanguage(language)
+
+        self.controller.translateUi()
+        self.controller.controller.translateUi()
+
     def _showHelpMessage(self):
         _translate = QtCore.QCoreApplication.translate
         msgBoxLogin = QMessageBox()
@@ -205,19 +229,12 @@ class ApplicationView:
 
     def _showLicenseView(self):
 
-        if isinstance(self.visibleForm, LicenseWidgetPanel.LicenseWidgetPanel):
-            LicenseView = QtWidgets.QWidget(self.centralWidget)
-            LoginWidgetPanel.LoginWidgetPanel(LicenseView, self.centralWidget, self)
-            self.gridLayout.addWidget(LicenseView)
-            self.visibleForm.Form.close()
-            self.visibleForm = LicenseView
-        else:
-            LicenseView = QtWidgets.QWidget(self.centralWidget)
-            controller = LicenseWidgetPanel.LicenseWidgetPanel(LicenseView)
-            self.gridLayout.addWidget(controller.Form)
-            LicenseView.show()
-            self.visibleForm.close()
-            self.visibleForm = controller
+        LicenseView = QtWidgets.QWidget(self.centralWidget)
+        controller = LicenseWidgetPanel.LicenseWidgetPanel(LicenseView)
+        self.gridLayout.addWidget(controller.Form)
+        self.visibleForm.close()
+        self.visibleForm = LicenseView
+        LicenseView.show()
 
     def _setRecentProjectName(self):
 
@@ -318,26 +335,62 @@ class ApplicationView:
         self.recentProjectsData = recentProjects
 
     def translateUi(self, MainWindow):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
+
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", str(self.projectName)))
-        self.menuProject.setTitle(_translate("MainWindow", "File"))
-        self.menuOpen_Recent.setTitle(_translate("MainWindow", "Open Recent"))
-        self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
-        self.menuLanguage.setTitle(_translate("MainWindow", "Language"))
-        self.menuProject_2.setTitle(_translate("MainWindow", "Project"))
-        self.menuHelp.setTitle(_translate("MainWindow", "Help"))
-        self.menuViews.setTitle(_translate("MainWindow", "Views"))
-        self.actionNew_Project.setText(_translate("MainWindow", "New Project"))
-        self.actionOpen.setText(_translate("MainWindow", "Open..."))
-        self.actionExit.setText(_translate("MainWindow", "Exit"))
-        self.actionLicense.setText(_translate("MainWindow", "License"))
-        self.actionProgressView.setText(_translate("MainWindow", "Progress View"))
-        self.actionStatus_View.setText(_translate("MainWindow", "Status View"))
-        self.actionClose_Project.setText(_translate("MainWindow", "Close Project"))
-        self.actionDelete_Project.setText(_translate("MainWindow", "Delete Project"))
-        self.actionRename.setText(_translate("MainWindow", "Rename..."))
-        self.actionChange_Location.setText(_translate("MainWindow", "Change Location"))
-        self.actionEN.setText(_translate("MainWindow", "EN"))
-        self.actionES.setText(_translate("MainWindow", "ES"))
-        self.actionEUS.setText(_translate("MainWindow", "EUS"))
-        self.actionProgress_View.setText(_translate("MainWindow", "Progress View"))
+        self.menuProject.setTitle(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                               'menu_file_title')).encode('ansi')))
+        self.menuOpen_Recent.setTitle(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                   'menu_open_recent_project_title'))
+                                                 .encode('ansi')))
+        self.menuSettings.setTitle(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                'menu_settings_title')).encode('ansi')))
+        self.menuLanguage.setTitle(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                'menu_language_title')).encode('ansi')))
+        self.menuProject_2.setTitle(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                 'menu_project_title')).encode('ansi')))
+        self.menuHelp.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                           'menu_help_title')).encode('ansi')))
+        self.menuViews.setTitle(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                             'menu_views_title')).encode('ansi')))
+        self.actionNew_Project.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                    'action_new_project_title'))
+                                                  .encode('ansi')))
+        self.actionOpen.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                             'action_open_title')).encode('ansi')))
+        self.actionExit.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                             'action_exit_title')).encode('ansi')))
+        self.actionLicense.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                'action_license_title'))
+                                              .encode('ansi')))
+        self.actionProgressView.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                     'action_progress_view_tile'))
+                                                   .encode('ansi')))
+        self.actionStatus_View.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                    'action_status_view_title'))
+                                                  .encode('ansi')))
+        self.actionClose_Project.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                      'action_close_project_title'))
+                                                    .encode('ansi')))
+        self.actionDelete_Project.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                       'action_delete_project_title'))
+                                                     .encode('ansi')))
+        self.actionRename.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                               'action_rename_title')).encode('ansi')))
+        self.actionChange_Location.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                        'action_change_location_title'))
+                                                      .encode('ansi')))
+        self.actionEN.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                           'action_language_english_title'))
+                                         .encode('ansi')))
+        self.actionES.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                           'action_language_spanish_title'))
+                                         .encode('ansi')))
+        self.actionEUS.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                            'action_language_basque_title'))
+                                          .encode('ansi')))
+        self.actionProgress_View.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
+                                                                                      'action_progress_view_title'))
+                                                    .encode('ansi')))

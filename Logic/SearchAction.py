@@ -1,4 +1,8 @@
+import configparser
+import urllib
+
 from PyQt5.QtCore import QThread, pyqtSignal
+from Connecttion import Connection
 
 
 class SearchAction(QThread):
@@ -7,14 +11,25 @@ class SearchAction(QThread):
     search_success = pyqtSignal()
     filesName = True
 
-    def __init__(self, connection, text):
+    def __init__(self, connection, text, search_err):
         super(QThread, self).__init__()
         self.connection = connection
         self.searchText = text
+        self.searchError = search_err
+
+        self.configGeneral = configparser.RawConfigParser()
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.fix_ip = self.configGeneral.get('IP', 'fix_ip')
+        self.wireless_ip = self.configGeneral.get('IP', 'wireless_ip')
 
     def run(self):
 
-        self.filesName = self.connection.dataSearch(self.searchText)
+        ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+
+        if ip == self.fix_ip or ip == self.wireless_ip:
+            self.connection = Connection.Connections()
+
+        self.filesName = self.connection.dataSearch(self.searchText, self.searchError)
 
         if self.filesName is False:
             self.search_error.emit()

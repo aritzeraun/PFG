@@ -253,6 +253,9 @@ class NewProjectDialog(object):
         self.folderInputLine.setText(str(folder))
 
     def translateUi(self, Dialog):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
+
         _translate = QtCore.QCoreApplication.translate
         if self.typology == 0:
             Dialog.setWindowTitle(_translate("Dialog", str(self.config.get('NewProjectDialogSection',

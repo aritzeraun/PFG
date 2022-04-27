@@ -33,6 +33,14 @@ class KeyWordsWidgetPanel(object):
         self.addKeyButton = QtWidgets.QPushButton(self.buttonsWidget)
         self.analiseButton = QtWidgets.QPushButton(self.buttonsWidget)
         self.createGraphicsButton = QtWidgets.QPushButton(self.buttonsWidget)
+        self.widgetParametrization = QtWidgets.QWidget(self.widget)
+        self.gridLayoutParametrization = QtWidgets.QGridLayout(self.widgetParametrization)
+        self.min_char_length_SpinBox = QtWidgets.QSpinBox(self.widgetParametrization)
+        self.min_keyword_frequency_SpinBox = QtWidgets.QSpinBox(self.widgetParametrization)
+        self.min_phrase_freq_adj_SpinBox = QtWidgets.QSpinBox(self.widgetParametrization)
+        self.min_char_length_label = QtWidgets.QLabel(self.widgetParametrization)
+        self.min_phrase_freq_adj_label = QtWidgets.QLabel(self.widgetParametrization)
+        self.min_keyword_frequency_label = QtWidgets.QLabel(self.widgetParametrization)
 
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
@@ -45,7 +53,7 @@ class KeyWordsWidgetPanel(object):
                                                                                      'analysis_folder_name') + '/'
         self.downloadFilesFolder = self.ProjectDirectory + '/'
         self.downloadFilesFolder = self.downloadFilesFolder + self.configGeneral.get('LOCATIONS',
-                                                                                     'downloaded_files_folder_name')+'/'
+                                                                                     'data_extraction_folder_name')+'/'
         self.keyListFilePath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS', 'key_list_file_name')
         self.stopPathFile = self.configGeneral.get('LOCATIONS', 'stop_file_relative_path')
         self.relationFilePath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS', 'key_relation_file_name')
@@ -122,11 +130,9 @@ class KeyWordsWidgetPanel(object):
         self.gifChargingLabel.setText("")
         self.gifChargingLabel.setObjectName("gifChargingLabel")
         self.labelWidgetLayout.addWidget(self.gifChargingLabel, 0, 0, 1, 1)
-        self.generalGridLayout.addWidget(self.labelWidget, 1, 1, 1, 1)
-        spacerItemLeft = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.generalGridLayout.addItem(spacerItemLeft, 1, 2, 1, 1)
+        self.generalGridLayout.addWidget(self.labelWidget, 1, 2, 1, 1)
         spacerItemRight = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.generalGridLayout.addItem(spacerItemRight, 1, 0, 1, 1)
+        self.generalGridLayout.addItem(spacerItemRight, 1, 3, 1, 1)
         self.buttonsWidget.setMinimumSize(QtCore.QSize(100, 100))
         self.buttonsWidget.setObjectName("buttonsWidget")
         self.buttonsWidgetLayout.setObjectName("buttonsWidgetLayout")
@@ -201,10 +207,44 @@ class KeyWordsWidgetPanel(object):
         self.createGraphicsButton.setIcon(icon)
         self.createGraphicsButton.setObjectName("createGraphicsButton")
         self.buttonsWidgetLayout.addWidget(self.createGraphicsButton, 3, 0, 1, 1)
-        self.generalGridLayout.addWidget(self.buttonsWidget, 1, 3, 1, 1)
+        self.generalGridLayout.addWidget(self.buttonsWidget, 1, 4, 1, 1)
+        self.widgetParametrization.setObjectName("widgetParametrization")
+        self.gridLayoutParametrization.setObjectName("gridLayoutParametrization")
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.min_keyword_frequency_label.setFont(font)
+        self.min_char_length_SpinBox.setMinimum(1)
+        self.min_char_length_SpinBox.setProperty("value", 3)
+        self.min_char_length_SpinBox.setObjectName("spinBox")
+        self.min_char_length_SpinBox.setFont(font)
+        self.gridLayoutParametrization.addWidget(self.min_char_length_SpinBox, 0, 1, 1, 1)
+        self.min_phrase_freq_adj_SpinBox.setMinimum(1)
+        self.min_phrase_freq_adj_SpinBox.setProperty("value", 8)
+        self.min_phrase_freq_adj_SpinBox.setFont(font)
+        self.min_phrase_freq_adj_SpinBox.setObjectName("min_phrase_freq_adj_SpinBox")
+        self.gridLayoutParametrization.addWidget(self.min_phrase_freq_adj_SpinBox, 1, 1, 1, 1)
+        self.min_keyword_frequency_SpinBox.setMinimum(1)
+        self.min_keyword_frequency_SpinBox.setProperty("value", 6)
+        self.min_keyword_frequency_SpinBox.setFont(font)
+        self.min_keyword_frequency_SpinBox.setObjectName("min_keyword_frequency_SpinBox")
+        self.gridLayoutParametrization.addWidget(self.min_keyword_frequency_SpinBox, 2, 1, 1, 1)
+        self.min_char_length_label.setObjectName("min_char_length_label")
+        self.min_char_length_label.setFont(font)
+        self.gridLayoutParametrization.addWidget(self.min_char_length_label, 0, 0, 1, 1)
+        self.min_phrase_freq_adj_label.setObjectName("min_keyword_frequency_label")
+        self.min_phrase_freq_adj_label.setText("")
+        self.min_phrase_freq_adj_label.setFont(font)
+        self.gridLayoutParametrization.addWidget(self.min_phrase_freq_adj_label, 1, 0, 1, 1)
+        self.min_keyword_frequency_label.setObjectName("min_phrase_freq_adj_label")
+        self.min_keyword_frequency_label.setText("")
+        self.gridLayoutParametrization.addWidget(self.min_keyword_frequency_label, 2, 0, 1, 1)
+        self.generalGridLayout.addWidget(self.widgetParametrization, 1, 0, 1, 1)
+        spacerItemLeft = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.generalGridLayout.addItem(spacerItemLeft, 1, 1, 1, 1)
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
 
-        self.translateUi(Form)
+        self.translateUi()
         QtCore.QMetaObject.connectSlotsByName(Form)
 
         self.findKeysButton.clicked.connect(lambda: self.findKeyWords(1))
@@ -315,7 +355,9 @@ class KeyWordsWidgetPanel(object):
                 if exists(self.keyListFilePath) and exists(self.relationFilePath) and exists(
                         self.uniqueKeysFilePath) and exists(self.matrixAnalysisFile) and exists(self.finalDocumentPath):
                     dialog = QtWidgets.QDialog(self.centralWidget)
-                    controller = DialogWidget.DialogWidget(dialog, "apa", "iap")
+                    text_1 = str(self.config.get('KeyWordsViewSection', 'dialog_widget_message_text_1'))
+                    text_2 = str(self.config.get('KeyWordsViewSection', 'dialog_widget_message_text_2'))
+                    controller = DialogWidget.DialogWidget(dialog, text_1, text_2)
                     dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
                     dialog.exec_()
 
@@ -325,12 +367,15 @@ class KeyWordsWidgetPanel(object):
                 os.mkdir(self.keyExtractionFolder)
 
             if changeState:
-                loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges(True))
+                loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges(False))
 
                 self.thread = AnalyseDocuments.AnalyseDocuments(dataToAnalise, self.downloadFilesFolder,
                                                                 self.stopPathFile, self.relationFilePath,
                                                                 self.uniqueKeysFilePath,
-                                                                self.matrixAnalysisFile, self.finalDocumentPath)
+                                                                self.matrixAnalysisFile, self.finalDocumentPath,
+                                                                self.min_char_length_SpinBox.value(),
+                                                                self.min_phrase_freq_adj_SpinBox.value(),
+                                                                self.min_keyword_frequency_SpinBox.value())
                 self.thread.successful_Action.connect(lambda: self.allCorrect())
                 loadView.start()
                 self.thread.start()
@@ -340,6 +385,13 @@ class KeyWordsWidgetPanel(object):
         self.addKeyButton.setEnabled(True)
         self.analiseButton.setEnabled(True)
         self.createGraphicsButton.setEnabled(True)
+        self.min_keyword_frequency_label.setEnabled(True)
+        self.min_phrase_freq_adj_SpinBox.setEnabled(True)
+        self.min_phrase_freq_adj_label.setEnabled(True)
+        self.min_keyword_frequency_SpinBox.setEnabled(True)
+        self.min_char_length_label.setEnabled(True)
+        self.min_char_length_SpinBox.setEnabled(True)
+        self.MainWindow.dockWidget.setEnabled(True)
         self.gifChargingLabel.clear()
 
     def findKeyWords(self, typology):
@@ -351,7 +403,9 @@ class KeyWordsWidgetPanel(object):
         if typology == 1:
             if exists(self.keyListFilePath):
                 dialog = QtWidgets.QDialog(self.centralWidget)
-                controller = DialogWidget.DialogWidget(dialog, "apa", "iap")
+                text_1 = str(self.config.get('KeyWordsViewSection', 'dialog_widget_message_text_1'))
+                text_2 = str(self.config.get('KeyWordsViewSection', 'dialog_widget_message_text_2'))
+                controller = DialogWidget.DialogWidget(dialog, text_1, text_2)
                 dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
                 dialog.exec_()
                 if not controller.state:
@@ -360,11 +414,15 @@ class KeyWordsWidgetPanel(object):
                 if not exists(self.keyExtractionFolder):
                     os.mkdir(self.keyExtractionFolder)
 
-        loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges(False))
-
         if changeState:
+
+            loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges(True))
+
             self.thread = FindKeyWords.FindKeyWords(typology, data, self.downloadFilesFolder, self.keyListFilePath,
-                                                    self.stopPathFile, self.relationFilePath)
+                                                    self.stopPathFile, self.relationFilePath,
+                                                    self.min_char_length_SpinBox.value(),
+                                                    self.min_phrase_freq_adj_SpinBox.value(),
+                                                    self.min_keyword_frequency_SpinBox.value())
             self.thread.successful_Action.connect(
                 lambda: self.successful_Action(changeState, self.thread.data, typology))
             loadView.start()
@@ -379,8 +437,17 @@ class KeyWordsWidgetPanel(object):
         self.findKeysButton.setEnabled(False)
         self.analiseButton.setEnabled(False)
         self.addKeyButton.setEnabled(False)
+        self.min_keyword_frequency_label.setEnabled(False)
+        self.min_phrase_freq_adj_SpinBox.setEnabled(False)
+        self.min_phrase_freq_adj_label.setEnabled(False)
+        self.min_keyword_frequency_SpinBox.setEnabled(False)
+        self.min_char_length_label.setEnabled(False)
+        self.min_char_length_SpinBox.setEnabled(False)
         self.createGraphicsButton.setEnabled(False)
-        self.translateUi(self.Form)
+        self.translateUi()
+
+        # set dockWidget enable
+        self.MainWindow.dockWidget.setEnabled(False)
 
     def successful_Action(self, changeState, data, typology):
 
@@ -425,22 +492,47 @@ class KeyWordsWidgetPanel(object):
             self.analiseButton.setEnabled(True)
             self.gifChargingLabel.clear()
             self.findKeysButton.setEnabled(True)
+            self.min_keyword_frequency_label.setEnabled(True)
+            self.min_phrase_freq_adj_SpinBox.setEnabled(True)
+            self.min_phrase_freq_adj_label.setEnabled(True)
+            self.min_keyword_frequency_SpinBox.setEnabled(True)
+            self.min_char_length_label.setEnabled(True)
+            self.min_char_length_SpinBox.setEnabled(True)
+            self.MainWindow.dockWidget.setEnabled(True)
 
             if typology == 3:
                 self.createGraphicsButton.setEnabled(True)
 
-    def translateUi(self, Form):
+    def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
         self.tableWidget.setSortingEnabled(False)
         item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("Form", "KeyWord"))
+        item.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                            'table_header_title_1')).encode('ansi')))
         item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("Form", "Self kew"))
-        self.findKeysButton.setText(_translate("Form", "Find KeyWord"))
+        item.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                            'table_header_title_2')).encode('ansi')))
+        self.findKeysButton.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                                           'find_keywords_button_text'))
+                                               .encode('ansi')))
         self.findKeysButton.setShortcut(_translate("Form", "Ctrl+F"))
-        self.analiseButton.setText(_translate("Form", "Analise"))
+        self.analiseButton.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                                          'analise_button_text')).encode('ansi')))
         self.analiseButton.setShortcut(_translate("Form", "Ctrl+A"))
-        self.addKeyButton.setText(_translate("Form", "Add KeyWord"))
+        self.addKeyButton.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                                         'add_key_button_text')).encode('ansi')))
         self.addKeyButton.setShortcut(_translate("Form", "Ctrl+K"))
-        self.createGraphicsButton.setText(_translate("Form", "Create Graphics"))
+        self.createGraphicsButton.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                                                 'go_to_graphic_button_text'))
+                                                     .encode('ansi')))
+        self.min_phrase_freq_adj_label.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                                     'minimum_phrase_frequency_adj_label_text'))
+                                                          .encode('ansi')))
+        self.min_keyword_frequency_label.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                                   'minimum_keyword_frequency_label_text'))
+                                                            .encode('ansi')))
+        self.min_char_length_label.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
+                                                               'minimum_keyword_length_label_text'))
+                                           .encode('ansi')))

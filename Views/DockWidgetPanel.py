@@ -1,10 +1,11 @@
 import configparser
+import urllib
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from Connecttion import IntenetConnection
 from Views import GraphicWidgetPanel, WithoutConnectionPanelWidget, LoginWidgetPanel, KeyWordsWidgetPanel, \
-    ResultWidgetPanel
+    ResultWidgetPanel, SearchWidgetPanel
 
 
 class DockWidgetPanel(object):
@@ -29,12 +30,16 @@ class DockWidgetPanel(object):
         self.config = configparser.RawConfigParser()
         self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
 
+        self.fix_ip = self.configGeneral.get('IP', 'fix_ip')
+        self.wireless_ip = self.configGeneral.get('IP', 'wireless_ip')
+
         self.font = self.configGeneral.get('SYSTEM', 'accessibility_current_font')
         self.fontSize = int(self.configGeneral.get('SYSTEM', 'accessibility_current_font_size'))
         self.mainColor = self.configGeneral.get('SYSTEM', 'theme_current_main_color')
         self.secondaryColor = self.configGeneral.get('SYSTEM', 'theme_current_secondary_color')
 
         self.visibleForm = QtWidgets.QWidget(self.centralWidget)
+        self.controller = None
         self.setupUi(self.Form)
 
     def setupUi(self, Form):
@@ -105,7 +110,6 @@ class DockWidgetPanel(object):
         self.downloadButton.clicked.connect(lambda: self.goToPanel(2))
         self.analiseButton.clicked.connect(lambda: self.goToPanel(3))
         self.graphicsButton.clicked.connect(lambda: self.goToPanel(4))
-
         self.goToPanel(1)
 
     def goToPanel(self, actionType):
@@ -118,46 +122,60 @@ class DockWidgetPanel(object):
         if actionType == 1:
             self.searchButton.setStyleSheet("background-color: rgb" + self.mainColor + "; border: none;")
             if IntenetConnection.connectionToEthernet():
-                LicenseView = QtWidgets.QWidget(self.centralWidget)
-                LoginWidgetPanel.LoginWidgetPanel(LicenseView, self.centralWidget, self)
-                self.visibleForm.close()
-                self.visibleForm = LicenseView
-                self.MainWindow.gridLayout.addWidget(LicenseView)
+                ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+                if ip != self.fix_ip and ip != self.wireless_ip:
+                    LicenseView = QtWidgets.QWidget(self.centralWidget)
+                    self.controller = LoginWidgetPanel.LoginWidgetPanel(LicenseView, self.centralWidget,
+                                                                        self.MainWindow)
+                    self.MainWindow.visibleForm.close()
+                    self.MainWindow.visibleForm = LicenseView
+                    self.MainWindow.gridLayout.addWidget(LicenseView)
+                else:
+                    SearchView = QtWidgets.QWidget(self.centralWidget)
+                    self.controller = SearchWidgetPanel.SearchWidgetPanel(SearchView, None, self.centralWidget,
+                                                                          self.MainWindow)
+                    self.MainWindow.visibleForm.close()
+                    self.MainWindow.visibleForm = SearchView
+                    self.MainWindow.gridLayout.addWidget(SearchView)
             else:
                 WithoutConnectionView = QtWidgets.QWidget(self.centralWidget)
-                WithoutConnectionPanelWidget.WithoutConnectionPanelWidget(WithoutConnectionView, self.centralWidget,
-                                                                          self.MainWindow)
-                self.visibleForm = WithoutConnectionView
+                self.controller = WithoutConnectionPanelWidget.WithoutConnectionPanelWidget(WithoutConnectionView,
+                                                                                            self.centralWidget,
+                                                                                            self.MainWindow)
+                self.MainWindow.visibleForm = WithoutConnectionView
                 self.MainWindow.gridLayout.addWidget(WithoutConnectionView)
         elif actionType == 2:
             self.downloadButton.setStyleSheet("background-color: rgb" + self.mainColor + "; border: none;")
             resultView = QtWidgets.QWidget(self.centralWidget)
-            controller = ResultWidgetPanel.ResultWidgetPanel(resultView, self.centralWidget, self.MainWindow,
-                                                             self.projectDirectory)
-            self.MainWindow.gridLayout.addWidget(controller.Form)
-            self.visibleForm.close()
-            self.visibleForm = resultView
+            self.controller = ResultWidgetPanel.ResultWidgetPanel(resultView, self.centralWidget, self.MainWindow,
+                                                                  self.projectDirectory)
+
+            self.MainWindow.gridLayout.addWidget(self.controller.Form)
+            self.MainWindow.visibleForm.close()
+            self.MainWindow.visibleForm = resultView
 
         elif actionType == 3:
             self.analiseButton.setStyleSheet("background-color: rgb" + self.mainColor + "; border: none;")
             keyWordView = QtWidgets.QWidget(self.centralWidget)
-            controller = KeyWordsWidgetPanel.KeyWordsWidgetPanel(keyWordView, self.centralWidget, self.MainWindow,
-                                                                 self.projectDirectory)
-            self.MainWindow.gridLayout.addWidget(controller.Form)
-            self.visibleForm.close()
-            self.visibleForm = keyWordView
+            self.controller = KeyWordsWidgetPanel.KeyWordsWidgetPanel(keyWordView, self.centralWidget, self.MainWindow,
+                                                                      self.projectDirectory)
+            self.MainWindow.gridLayout.addWidget(self.controller.Form)
+            self.MainWindow.visibleForm.close()
+            self.MainWindow.visibleForm = keyWordView
 
         elif actionType == 4:
             self.graphicsButton.setStyleSheet("background-color: rgb" + self.mainColor + "; border: none;")
 
             graphicsView = QtWidgets.QWidget(self.centralWidget)
-            controller = GraphicWidgetPanel.GraphicWidgetPanel(graphicsView, self.centralWidget, self.MainWindow,
-                                                               self.projectDirectory)
-            self.MainWindow.gridLayout.addWidget(controller.Form)
-            self.visibleForm.close()
-            self.visibleForm = graphicsView
+            self.controller = GraphicWidgetPanel.GraphicWidgetPanel(graphicsView, self.centralWidget, self.MainWindow,
+                                                                    self.projectDirectory)
+            self.MainWindow.gridLayout.addWidget(self.controller.Form)
+            self.MainWindow.visibleForm.close()
+            self.MainWindow.visibleForm = graphicsView
 
     def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
+        self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
         self.graphicsButton.setText(_translate("Form", str(self.config.get('DockWidgetSection',
                                                                            'graphics_button_text')).encode('ansi')))

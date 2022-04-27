@@ -80,6 +80,7 @@ class LicenseWidgetPanel(object):
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def translateUi(self):
+        self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
         _translate = QtCore.QCoreApplication.translate
         self.copyrightLabel.setText(_translate("Form", "© 2022 Aritz Erauncetamurgil Barcina"))
         self.nameLabel.setText(_translate("Form", "SpyDocument \n v2022.1"))

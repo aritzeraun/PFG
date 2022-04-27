@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle(str(configGeneral.get('SYSTEM', 'theme_current_style')))
-    app.setWindowIcon(QtGui.QIcon('./GUI/SpyDocument.png'))
+    app.setWindowIcon(QtGui.QIcon('./Resources/img/app_icon.ico'))
     app.setApplicationVersion("v 2022.1")
     app.setApplicationDisplayName("SpyDocument")
 

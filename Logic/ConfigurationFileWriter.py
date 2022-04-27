@@ -38,3 +38,10 @@ class ConfigurationFileWriter:
         # Write the above sections to config.cfg file
         with open('./Configuration/AppGeneralConfiguration.cfg', 'w') as conf:
             self.config_object.write(conf)
+
+    def changeLanguage(self, language):
+        self.config_object.set('SYSTEM', 'language_code', str(language))
+
+        # Write the above sections to config.cfg file
+        with open('./Configuration/AppGeneralConfiguration.cfg', 'w') as conf:
+            self.config_object.write(conf)
