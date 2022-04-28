@@ -10,6 +10,7 @@ from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
+from fake_useragent import UserAgent
 
 
 class Connections:
@@ -20,11 +21,17 @@ class Connections:
     def driverCreator(self):
 
         ROOT_DIR = os.path.abspath(os.curdir)
+        ua = UserAgent()
+        userAgent = ua.random
         ROOT_DIR = ROOT_DIR + '\Downloads'
         op = webdriver.ChromeOptions()
         op.add_argument('--headless')
+        op.add_argument(f'user-agent={userAgent}')
         op.add_argument('--start-maximized')
         op.add_argument('--disable-extensions')
+        op.add_argument("--window-size=1920,1080")
+        op.add_argument('--ignore-certificate-errors')
+        op.add_argument('--allow-running-insecure-content')
         prefs = {'download.default_directory': ROOT_DIR}
         op.add_experimental_option('prefs', prefs)
         self.driver = webdriver.Chrome("./Driver/chromedriver.exe", options=op)
@@ -57,8 +64,13 @@ class Connections:
     def dataSearch(self, topic, search_error):
 
         if not search_error:
-            self.driver.get(self.URL)
+            try:
+                WebDriverWait(self.driver, 5).until(
+                    ec.element_to_be_clickable((By.XPATH, '//*[@id="onetrust-accept-btn-handler"]'))).click()
+            except Exception:
+                print("")
 
+            self.driver.get(self.URL)
         try:
             WebDriverWait(self.driver, 10).until(
                 ec.element_to_be_clickable((By.ID, 'onetrust-accept-btn-handler'.replace(' ', '.')))).click()
@@ -106,6 +118,9 @@ class Connections:
 
         for i in range(0, number_of_results_rounded + 1):
 
+            # Gets image of the situation with headless
+            # self.driver.get_screenshot_as_file('./Downloads/ej.png')
+
             #  export data file
             WebDriverWait(self.driver, 10).until(ec.element_to_be_clickable(
                 (By.XPATH, '//*[@id="snRecListTop"]/app-export-menu/div/button'.replace(' ', '.')))).click()
@@ -152,11 +167,11 @@ class Connections:
 
             time.sleep(5)
 
-            fileName = self.getDownLoadedFileName()
-            filesName.append(fileName)
+            # fileName = self.getDownLoadedFileName()
+            # filesName.append(fileName)
 
         self.driver.close()
-        return filesName
+        # return filesName
 
     # method to get the downloaded file name
     def getDownLoadedFileName(self):

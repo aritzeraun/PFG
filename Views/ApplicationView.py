@@ -170,7 +170,6 @@ class ApplicationView:
         self._setRecentProjectName()
 
     def _deleteProject(self):
-        print(self.projectDirectory)
         try:
             shutil.rmtree(self.projectDirectory + '/')
             recentProject = self.recentProjectsData.pop(0)

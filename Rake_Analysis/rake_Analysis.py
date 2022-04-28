@@ -11,25 +11,26 @@ from os import listdir
 def writeKeyFile(downloadedFilesFolder, keyFilePath, rake_object):
     f = open(keyFilePath, "w+", encoding="iso-8859-1")
     for file in listdir(downloadedFilesFolder):
-        sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
-        text = sample_file.read()
-        keywords = rake_object.run(text)
-        i = 0
-        enc = False
-        try:
-            f.write(file + ";")
-            for key in keywords:
-                if i == 0:
-                    f.write(key[0])
-                    enc = True
-                if 0 < i < 15:
-                    print(key[0])
-                    f.write("," + key[0])
-                i = i + 1
-        except Exception:
-            print("error")
-        if enc:
-            f.write("\n")
+        if file.endswith('.txt'):
+            sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
+            text = sample_file.read()
+            keywords = rake_object.run(text)
+            i = 0
+            enc = False
+            try:
+                f.write(file + ";")
+                for key in keywords:
+                    if i == 0:
+                        f.write(key[0])
+                        enc = True
+                    if 0 < i < 15:
+                        print(key[0])
+                        f.write("," + key[0])
+                    i = i + 1
+            except Exception:
+                print("error")
+            if enc:
+                f.write("\n")
     f.flush()
     f.close()
 
@@ -38,22 +39,22 @@ def writeKeyListFile(downloadedFilesFolder, keyListFilePath, rake_object):
     f = open(keyListFilePath, "w+", encoding="iso-8859-1")
 
     for file in listdir(downloadedFilesFolder):
-
-        sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
-        text = sample_file.read()
-        keywords = rake_object.run(text)
-        i = 0
-        enc = False
-        try:
-            for key in keywords:
-                if i < 15:
-                    print(key[0])
-                    f.write(key[0] + "\n")
-                i = i + 1
-        except Exception:
-            print("error")
-        if enc:
-            f.write("\n")
+        if file.endswith('.txt'):
+            sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
+            text = sample_file.read()
+            keywords = rake_object.run(text)
+            i = 0
+            enc = False
+            try:
+                for key in keywords:
+                    if i < 15:
+                        print(key[0])
+                        f.write(key[0] + "\n")
+                    i = i + 1
+            except Exception:
+                print("error")
+            if enc:
+                f.write("\n")
     f.flush()
     f.close()
 
@@ -61,27 +62,28 @@ def writeKeyListFile(downloadedFilesFolder, keyListFilePath, rake_object):
 def writeUniqueKeysFile(downloadedFilesFolder, uniqueKeyListFilePath, rake_object, wordsDict):
     f = open(uniqueKeyListFilePath, "w+", encoding="iso-8859-1")
     for file in listdir(downloadedFilesFolder):
-        sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
-        text = sample_file.read()
-        keywords = rake_object.run(text)
-        i = 0
-        enc = False
-        for key in keywords:
-            try:
-                clave = key[0]
-                if i == 0:
-                    if clave in wordsDict:
-                        f.write(wordsDict[clave])
+        if file.endswith('.txt'):
+            sample_file = io.open(downloadedFilesFolder + file, 'r', encoding="iso-8859-1")
+            text = sample_file.read()
+            keywords = rake_object.run(text)
+            i = 0
+            enc = False
+            for key in keywords:
+                try:
+                    clave = key[0]
+                    if i == 0:
+                        if clave in wordsDict:
+                            f.write(wordsDict[clave])
+                            i = i + 1
+                            enc = True
+                    if i > 0:
+                        if clave in wordsDict:
+                            f.write("," + wordsDict[clave])
                         i = i + 1
-                        enc = True
-                if i > 0:
-                    if clave in wordsDict:
-                        f.write("," + wordsDict[clave])
-                    i = i + 1
-            except Exception:
-                print("error")
-        if enc:
-            f.write("\n")
+                except Exception:
+                    print("error")
+            if enc:
+                f.write("\n")
     f.flush()
     f.close()
 

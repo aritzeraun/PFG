@@ -26,8 +26,9 @@ class SearchAction(QThread):
 
         ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
 
-        if ip == self.fix_ip or ip == self.wireless_ip:
+        if ip == self.fix_ip or ip in self.wireless_ip:
             self.connection = Connection.Connections()
+            self.connection.driverCreator()
 
         self.filesName = self.connection.dataSearch(self.searchText, self.searchError)
 

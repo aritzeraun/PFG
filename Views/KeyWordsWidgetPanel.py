@@ -1,5 +1,6 @@
 import configparser
 import os
+import shutil
 import threading
 from os.path import exists
 
@@ -63,6 +64,9 @@ class KeyWordsWidgetPanel(object):
                                                                                     'matrix_analysis_file_name')
         self.finalDocumentPath = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
                                                                                    'normalised_matrix_file_name')
+         # GRAPHICS_FOLDER
+        self.GraphicsFolder = self.ProjectDirectory + '/'
+        self.GraphicsFolder = self.GraphicsFolder + self.configGeneral.get('LOCATIONS', 'graphics_folder_name') + '/'
 
         self.font = self.configGeneral.get('SYSTEM', 'accessibility_current_font')
         self.fontSize = int(self.configGeneral.get('SYSTEM', 'accessibility_current_font_size'))
@@ -361,7 +365,10 @@ class KeyWordsWidgetPanel(object):
                     dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
                     dialog.exec_()
 
-                    if not controller.state:
+                    if controller.state:
+                        if exists(self.GraphicsFolder):
+                            shutil.rmtree(self.GraphicsFolder)
+                    else:
                         changeState = False
             else:
                 os.mkdir(self.keyExtractionFolder)
@@ -408,7 +415,11 @@ class KeyWordsWidgetPanel(object):
                 controller = DialogWidget.DialogWidget(dialog, text_1, text_2)
                 dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
                 dialog.exec_()
-                if not controller.state:
+
+                if controller.state:
+                    if exists(self.GraphicsFolder):
+                        shutil.rmtree(self.GraphicsFolder)
+                else:
                     changeState = False
             if changeState:
                 if not exists(self.keyExtractionFolder):

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>770</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>770</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuOpen_Recent">
+     <property name="title">
+      <string>Open Recent</string>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionProject_1"/>
+     <addaction name="actionProject_2"/>
+     <addaction name="actionProject_3"/>
+     <addaction name="actionProyect_4"/>
+     <addaction name="actionProyect_5"/>
+    </widget>
+    <addaction name="actionNew_Project"/>
+    <addaction name="actionOpen"/>
+    <addaction name="menuOpen_Recent"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <widget class="QMenu" name="menuLanguage">
+     <property name="title">
+      <string>Language</string>
+     </property>
+     <addaction name="actionEN"/>
+     <addaction name="actionES"/>
+     <addaction name="actionEUS"/>
+    </widget>
+    <addaction name="menuLanguage"/>
+    <addaction name="actionLicense"/>
+   </widget>
+   <widget class="QMenu" name="menuProject_2">
+    <property name="title">
+     <string>Project</string>
+    </property>
+    <addaction name="actionChange_Location"/>
+    <addaction name="actionRename_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose_Project"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuViews">
+    <property name="title">
+     <string>Views</string>
+    </property>
+    <addaction name="actionProgress_View"/>
+    <addaction name="actionStatus_View_2"/>
+   </widget>
+   <addaction name="menuProject"/>
+   <addaction name="menuProject_2"/>
+   <addaction name="menuViews"/>
+   <addaction name="menuSettings"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QToolBox" name="toolBox">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="page">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>85</width>
+          <height>439</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Page 1</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="page_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>98</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Page 2</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionNew_Project">
+   <property name="text">
+    <string>New Project</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset>
+     <normaloff>deusto.png</normaloff>deusto.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open...</string>
+   </property>
+  </action>
+  <action name="actionProject_1">
+   <property name="text">
+    <string>Project 1</string>
+   </property>
+  </action>
+  <action name="actionProject_2">
+   <property name="text">
+    <string>Project 2</string>
+   </property>
+  </action>
+  <action name="actionProject_3">
+   <property name="text">
+    <string>Project 3</string>
+   </property>
+  </action>
+  <action name="actionProyect_4">
+   <property name="text">
+    <string>Proyect 4</string>
+   </property>
+  </action>
+  <action name="actionProyect_5">
+   <property name="text">
+    <string>Proyect 5</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionLicense">
+   <property name="text">
+    <string>License</string>
+   </property>
+  </action>
+  <action name="actionProgressView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Progress View</string>
+   </property>
+  </action>
+  <action name="actionStatus_View">
+   <property name="text">
+    <string>Status View</string>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="text">
+    <string>Rename...</string>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="text">
+    <string>Close Project</string>
+   </property>
+  </action>
+  <action name="actionRename_2">
+   <property name="text">
+    <string>Rename...</string>
+   </property>
+  </action>
+  <action name="actionChange_Location">
+   <property name="text">
+    <string>Change Location</string>
+   </property>
+  </action>
+  <action name="actionEN">
+   <property name="text">
+    <string>EN</string>
+   </property>
+  </action>
+  <action name="actionES">
+   <property name="text">
+    <string>ES</string>
+   </property>
+  </action>
+  <action name="actionEUS">
+   <property name="text">
+    <string>EUS</string>
+   </property>
+  </action>
+  <action name="actionProgress_View">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Progress View</string>
+   </property>
+  </action>
+  <action name="actionStatus_View_2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Status View</string>
+   </property>
+  </action>
+  <action name="actionlocura">
+   <property name="text">
+    <string>locura</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

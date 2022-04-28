@@ -16,6 +16,7 @@ from Views import DialogWidget
 
 class GraphicWidgetPanel(object):
     def __init__(self, Form, centralWidget, MainWindow, ProjectDirectory):
+
         self.Form = Form
         self.centralWidget = centralWidget
         self.MainWindow = MainWindow
@@ -27,13 +28,17 @@ class GraphicWidgetPanel(object):
         self.gridLayoutTop = QtWidgets.QGridLayout(self.widget)
         self.createGraphicButton = QtWidgets.QPushButton(self.widget)
         self.typeOfGraphicCombo = QtWidgets.QComboBox(self.widget)
-        self.widgetTop = QtWidgets.QWidget(Form)
-        self.gridLayoutSecond = QtWidgets.QGridLayout(self.widgetTop)
         self.widthSpinBox = QtWidgets.QSpinBox(self.widget)
         self.widthLabel = QtWidgets.QLabel(self.widget)
         self.heightLabel = QtWidgets.QLabel(self.widget)
         self.heightSpinBox = QtWidgets.QSpinBox(self.widget)
-        self.exportButton = QtWidgets.QPushButton(self.widgetTop)
+        self.exportButton = QtWidgets.QPushButton(self.widget)
+        self.SupportLabel = QtWidgets.QLabel(self.widget)
+        self.lineRight = QtWidgets.QFrame(self.widget)
+        self.lineLeft = QtWidgets.QFrame(self.widget)
+        self.confidenceLabel = QtWidgets.QLabel(self.widget)
+        self.supportSpinBox = QtWidgets.QDoubleSpinBox(self.widget)
+        self.confidenceSpinBox = QtWidgets.QDoubleSpinBox(self.widget)
 
         self.configGeneral = configparser.RawConfigParser()
         self.configGeneral.read('./Configuration/AppGeneralConfiguration.cfg')
@@ -49,8 +54,7 @@ class GraphicWidgetPanel(object):
         self.keyExtractionFolder = self.ProjectDirectory + '/'
         self.keyExtractionFolder = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
                                                                                      'analysis_folder_name') + '/'
-        self.matrixAnalysisFile = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS',
-                                                                                    'unique_keys_file_name')
+        self.UniqueKeysFile = self.keyExtractionFolder + self.configGeneral.get('LOCATIONS', 'unique_keys_file_name')
 
         self.font = self.configGeneral.get('SYSTEM', 'accessibility_current_font')
         self.fontSize = int(self.configGeneral.get('SYSTEM', 'accessibility_current_font_size'))
@@ -62,20 +66,29 @@ class GraphicWidgetPanel(object):
         self.setupUi(self.Form)
 
     def setupUi(self, Form):
+
         Form.setObjectName("Form")
-        Form.resize(929, 590)
+        Form.resize(1171, 660)
         Form.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.gridLayout.setContentsMargins(-1, 0, -1, -1)
         self.gridLayout.setObjectName("gridLayout")
+        spacerItem = QtWidgets.QSpacerItem(20, 4, QtWidgets.QSizePolicy.Minimum,
+                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        self.gridLayout.addItem(spacerItem, 2, 0, 1, 1)
         self.graphicLabel.setText("")
         self.graphicLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.graphicLabel.setObjectName("graphicLabel")
-        self.gridLayout.addWidget(self.graphicLabel, 2, 0, 1, 1)
-        self.widget.setMinimumSize(QtCore.QSize(0, 80))
-        self.widget.setMaximumSize(QtCore.QSize(16777215, 80))
+        self.gridLayout.addWidget(self.graphicLabel, 1, 0, 1, 1)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        self.widget.setSizePolicy(sizePolicy)
+        self.widget.setMinimumSize(QtCore.QSize(0, 140))
+        self.widget.setMaximumSize(QtCore.QSize(16777215, 140))
         self.widget.setObjectName("widget")
-        self.gridLayoutTop.setObjectName("gridLayoutTop")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayoutTop.addItem(spacerItem, 0, 1, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayoutTop.addItem(spacerItem1, 0, 1, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
         font.setPointSize(int(self.fontSize))
@@ -92,10 +105,21 @@ class GraphicWidgetPanel(object):
                                                "}")
         self.createGraphicButton.setObjectName("createGraphicButton")
         self.gridLayoutTop.addWidget(self.createGraphicButton, 0, 2, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayoutTop.addItem(spacerItem1, 0, 3, 1, 1)
-        self.typeOfGraphicCombo.setMinimumSize(QtCore.QSize(190, 0))
-        self.typeOfGraphicCombo.setMaximumSize(QtCore.QSize(190, 16777215))
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayoutTop.addItem(spacerItem2, 0, 3, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.widthSpinBox.setFont(font)
+        self.widthSpinBox.setStyleSheet("")
+        self.widthSpinBox.setMinimum(400)
+        self.widthSpinBox.setMaximum(2000)
+        self.widthSpinBox.setSingleStep(100)
+        self.widthSpinBox.setProperty("value", 1000)
+        self.widthSpinBox.setObjectName("widthSpinBox")
+        self.gridLayoutTop.addWidget(self.widthSpinBox, 0, 5, 1, 1)
+        self.typeOfGraphicCombo.setMinimumSize(QtCore.QSize(130, 0))
+        self.typeOfGraphicCombo.setMaximumSize(QtCore.QSize(165, 16777215))
         font = QtGui.QFont()
         font.setFamily(self.font)
         font.setPointSize(int(self.fontSize))
@@ -115,23 +139,6 @@ class GraphicWidgetPanel(object):
         font = QtGui.QFont()
         font.setFamily(self.font)
         font.setPointSize(int(self.fontSize))
-        self.widthSpinBox.setFont(font)
-        self.widthSpinBox.setStyleSheet("")
-        self.widthSpinBox.setMinimum(400)
-        self.widthSpinBox.setMaximum(2000)
-        self.widthSpinBox.setSingleStep(100)
-        self.widthSpinBox.setProperty("value", 1000)
-        self.widthSpinBox.setObjectName("widthSpinBox")
-        self.gridLayoutTop.addWidget(self.widthSpinBox, 0, 5, 1, 1)
-        font = QtGui.QFont()
-        font.setFamily(self.font)
-        font.setPointSize(int(self.fontSize))
-        self.widthLabel.setFont(font)
-        self.widthLabel.setObjectName("widthLabel")
-        self.gridLayoutTop.addWidget(self.widthLabel, 0, 4, 1, 1)
-        font = QtGui.QFont()
-        font.setFamily(self.font)
-        font.setPointSize(int(self.fontSize))
         self.heightLabel.setFont(font)
         self.heightLabel.setObjectName("heightLabel")
         self.gridLayoutTop.addWidget(self.heightLabel, 1, 4, 1, 1)
@@ -145,13 +152,52 @@ class GraphicWidgetPanel(object):
         self.heightSpinBox.setProperty("value", 1000)
         self.heightSpinBox.setObjectName("heightSpinBox")
         self.gridLayoutTop.addWidget(self.heightSpinBox, 1, 5, 1, 1)
-        self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
-        self.widgetTop.setMinimumSize(QtCore.QSize(0, 50))
-        self.widgetTop.setMaximumSize(QtCore.QSize(16777215, 50))
-        self.widgetTop.setObjectName("widgetTop")
-        self.gridLayoutSecond.setObjectName("gridLayoutSecond")
-        spacerItem2 = QtWidgets.QSpacerItem(782, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayoutSecond.addItem(spacerItem2, 0, 0, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.widthLabel.setFont(font)
+        self.widthLabel.setObjectName("widthLabel")
+        self.gridLayoutTop.addWidget(self.widthLabel, 0, 4, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.SupportLabel.setFont(font)
+        self.SupportLabel.setObjectName("SupportLabel")
+        self.gridLayoutTop.addWidget(self.SupportLabel, 4, 4, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.lineRight.setFont(font)
+        self.lineRight.setFrameShape(QtWidgets.QFrame.HLine)
+        self.lineRight.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.lineRight.setObjectName("lineRight")
+        self.gridLayoutTop.addWidget(self.lineRight, 3, 4, 1, 1)
+        self.lineLeft.setFrameShape(QtWidgets.QFrame.HLine)
+        self.lineLeft.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.lineLeft.setObjectName("lineLeft")
+        self.gridLayoutTop.addWidget(self.lineLeft, 3, 5, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.confidenceLabel.setFont(font)
+        self.confidenceLabel.setObjectName("confidenceLabel")
+        self.gridLayoutTop.addWidget(self.confidenceLabel, 5, 4, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.supportSpinBox.setFont(font)
+        self.supportSpinBox.setSingleStep(0.05)
+        self.supportSpinBox.setProperty("value", 0.1)
+        self.supportSpinBox.setObjectName("supportSpinBox")
+        self.gridLayoutTop.addWidget(self.supportSpinBox, 4, 5, 1, 1)
+        font = QtGui.QFont()
+        font.setFamily(self.font)
+        font.setPointSize(int(self.fontSize))
+        self.confidenceSpinBox.setFont(font)
+        self.confidenceSpinBox.setSingleStep(0.05)
+        self.confidenceSpinBox.setProperty("value", 0.05)
+        self.confidenceSpinBox.setObjectName("confidenceSpinBox")
+        self.gridLayoutTop.addWidget(self.confidenceSpinBox, 5, 5, 1, 1)
         font = QtGui.QFont()
         font.setFamily(self.font)
         font.setPointSize(int(self.fontSize))
@@ -167,10 +213,9 @@ class GraphicWidgetPanel(object):
                                         "    background-color: rgb" + self.mainColor + ";\n"
                                         "}")
         self.exportButton.setObjectName("exportButton")
-        self.gridLayoutSecond.addWidget(self.exportButton, 0, 1, 1, 1)
-        self.gridLayout.addWidget(self.widgetTop, 1, 0, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem, 0, 1, 1, 1)
+        self.gridLayoutTop.addWidget(self.exportButton, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
+        Form.setObjectName("Form")
 
         self.translateUi()
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -197,7 +242,8 @@ class GraphicWidgetPanel(object):
         else:
             pixmap_image = QtGui.QPixmap(self.graphImageName)
 
-        pixmap_image.scaled(1000, 1000, QtCore.Qt.KeepAspectRatio)
+        pixmap_image.scaled(1600, 1000, QtCore.Qt.KeepAspectRatio)
+        pixmap_image.devicePixelRatio()
 
         self.graphicLabel.setPixmap(pixmap_image)
         self.graphicLabel.setAlignment(QtCore.Qt.AlignCenter)
@@ -231,6 +277,10 @@ class GraphicWidgetPanel(object):
         self.heightSpinBox.setEnabled(True)
         self.createGraphicButton.setEnabled(True)
         self.MainWindow.dockWidget.setEnabled(True)
+        self.supportSpinBox.setEnabled(True)
+        self.confidenceLabel.setEnabled(True)
+        self.confidenceSpinBox.setEnabled(True)
+        self.SupportLabel.setEnabled(True)
 
         if 'ular' in self.typeOfGraphicCombo.currentText():
             pixmap_image = QtGui.QPixmap(self.circularImageName)
@@ -277,10 +327,17 @@ class GraphicWidgetPanel(object):
         if editState:
             loadView = threading.Thread(name="loadViewThread", target=self.loadViewThread)
 
-            self.thread = GraphicCreator.GraphicCreatorAction(self.matrixAnalysisFile, self.widthSpinBox.value(),
-                                                              self.heightSpinBox.value(), self.circularImageName,
+            self.thread = GraphicCreator.GraphicCreatorAction(self.UniqueKeysFile, self.widthSpinBox.value(),
+                                                              self.heightSpinBox.value(), self.supportSpinBox.value(),
+                                                              self.confidenceSpinBox.value(), self.circularImageName,
                                                               self.graphImageName)
             self.thread.image_creation_correctly.connect(self.thread_image_creation_correctly)
+
+            self.supportSpinBox.setEnabled(False)
+            self.SupportLabel.setEnabled(False)
+            self.confidenceSpinBox.setEnabled(False)
+            self.confidenceLabel.setEnabled(False)
+
             loadView.start()
             self.thread.start()
 
@@ -331,3 +388,7 @@ class GraphicWidgetPanel(object):
                                                                         'height_label_text')).encode('ansi')))
         self.exportButton.setText(_translate("Form", str(self.config.get('GraphViewSection',
                                                                          'export_button_text')).encode('ansi')))
+        self.SupportLabel.setText(_translate("Form", str(self.config.get('GraphViewSection',
+                                                                         'support_label_text')).encode('ansi')))
+        self.confidenceLabel.setText(_translate("Form", str(self.config.get('GraphViewSection',
+                                                                            'confidence_label_text')).encode('ansi')))

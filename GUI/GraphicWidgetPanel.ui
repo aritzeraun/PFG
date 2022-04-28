@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1403</width>
-    <height>802</height>
+    <width>1171</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,73 +17,53 @@
    <string notr="true">background-color: rgb(255, 255, 255);</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <item row="2" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="1" column="0">
-    <widget class="QWidget" name="widget_2" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>50</height>
-      </size>
+    <widget class="QLabel" name="graphicLabel">
+     <property name="text">
+      <string/>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>50</height>
-      </size>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <spacer name="horizontalSpacerExport">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>782</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="exportButon">
-        <property name="font">
-         <font>
-          <family>Cascadia Mono</family>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton {
-	border: 2px solid;
- 	border-radius: 10px;
-	background-color: rgb(165, 134, 83);
-	padding-right: 20px;
-	padding-left: 20px;
-}
-QPushButton:hover {
-	background-color: rgb(95, 71, 10);
-}</string>
-        </property>
-        <property name="text">
-         <string>Exportar</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item row="0" column="0">
     <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>140</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>80</height>
+       <height>140</height>
       </size>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
@@ -137,6 +117,30 @@ QPushButton:hover {
         </property>
        </spacer>
       </item>
+      <item row="0" column="5">
+       <widget class="QSpinBox" name="widthSpinBox">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="minimum">
+         <number>400</number>
+        </property>
+        <property name="maximum">
+         <number>2000</number>
+        </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QComboBox" name="typeOfGraphicCombo">
         <property name="minimumSize">
@@ -178,42 +182,6 @@ QComboBox:hover {
         </item>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QSpinBox" name="widthSpinBox">
-        <property name="font">
-         <font>
-          <family>Cascadia Mono</family>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="minimum">
-         <number>400</number>
-        </property>
-        <property name="maximum">
-         <number>2000</number>
-        </property>
-        <property name="singleStep">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>1000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="widthLabel">
-        <property name="font">
-         <font>
-          <family>Cascadia Mono</family>
-         </font>
-        </property>
-        <property name="text">
-         <string>Width: </string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="4">
        <widget class="QLabel" name="heightLabel">
         <property name="font">
@@ -247,34 +215,117 @@ QComboBox:hover {
         </property>
        </widget>
       </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="widthLabel">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Width: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
+       <widget class="QLabel" name="SupportLabel">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Support:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="Line" name="lineRight">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="Line" name="lineLeft">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="4">
+       <widget class="QLabel" name="confidenceLabel">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confidence: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="5">
+       <widget class="QDoubleSpinBox" name="supportSpinBox">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="5">
+       <widget class="QDoubleSpinBox" name="confidenceSpinBox">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.050000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="exportButon">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+        </property>
+        <property name="text">
+         <string>Exportar</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="graphicLabel">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

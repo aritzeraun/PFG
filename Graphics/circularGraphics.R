@@ -1,5 +1,14 @@
 args <- commandArgs(trailingOnly = TRUE)
 
+# args[1] = directoryToDataFile
+# args[2] = width
+# args[3] = height
+# args[4] = support
+# args[5] = confidence
+# args[6] = circularDirectory
+# args[7] = graphDirectory
+
+
 library(circlize)
 library(migest)
 library(dplyr)
@@ -11,10 +20,11 @@ itemsetsMAXICLAVECLUSTER <- readLines(con = paste(args[1], sep=""))
 itemsetsMAXICLAVECLUSTER <- strsplit(itemsetsMAXICLAVECLUSTER, ",")
 head(itemsetsMAXICLAVECLUSTER, 1)
 
+# the values are transformed from string to double
+supportValue <- as.double(args[4])
+confidenceValue <- as.double(args[5])
 
-# rulesMAXICLAVECLUSTER <- apriori(itemsetsMAXICLAVECLUSTER, parameter=list(minlen=2, maxlen=2, support=0.45, confidence=0.8))
-# rulesMAXICLAVECLUSTER
-rulesMAXICLAVECLUSTER <- apriori(itemsetsMAXICLAVECLUSTER, parameter=list(minlen=2, maxlen=2, support=0.1, confidence=0.05))
+rulesMAXICLAVECLUSTER <- apriori(itemsetsMAXICLAVECLUSTER, parameter=list(minlen=2, maxlen=2, support=supportValue, confidence=confidenceValue))
 rulesMAXICLAVECLUSTER
 
 dataFrameMAXICLAVECLUSTER<- data.frame(
@@ -50,12 +60,12 @@ widthImage <- widthImage*10
 heightImage <- strtoi(args[3])
 heightImage <- heightImage*10
 
-jpeg(file=paste(args[5], sep=""),width=widthImage,height=heightImage, res=100)
+jpeg(file=paste(args[7], sep=""),width=widthImage,height=heightImage, res=100)
 plot(rulesMAXICLAVECLUSTER, method="graph",engine="igraph",cex=7,  control=list(max=length(rulesMAXICLAVECLUSTER)))
 dev.off()
 
 dev.new(width=500, height=400)
-jpeg(file=paste(args[4], sep=""),width=widthImage,height=heightImage,res=600)
+jpeg(file=paste(args[6], sep=""),width=widthImage,height=heightImage,res=600)
 
 chordDiagram(as.data.frame(dataFrameMAXICLAVECLUSTER),transparency = 0.3, directional = FALSE)
 dev.off()

@@ -4,6 +4,7 @@ import urllib
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from Connecttion import IntenetConnection
+from Logic import DeterminedStated
 from Views import GraphicWidgetPanel, WithoutConnectionPanelWidget, LoginWidgetPanel, KeyWordsWidgetPanel, \
     ResultWidgetPanel, SearchWidgetPanel
 
@@ -114,6 +115,9 @@ class DockWidgetPanel(object):
 
     def goToPanel(self, actionType):
 
+        controller = DeterminedStated.DeterminedState(self, self.projectDirectory)
+        controller.stateDetermination()
+
         self.searchButton.setStyleSheet("background-color: rgb" + self.secondaryColor + "; border: none;")
         self.downloadButton.setStyleSheet("background-color: rgb" + self.secondaryColor + "; border: none;")
         self.analiseButton.setStyleSheet("background-color: rgb" + self.secondaryColor + "; border: none;")
@@ -123,7 +127,7 @@ class DockWidgetPanel(object):
             self.searchButton.setStyleSheet("background-color: rgb" + self.mainColor + "; border: none;")
             if IntenetConnection.connectionToEthernet():
                 ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
-                if ip != self.fix_ip and ip != self.wireless_ip:
+                if ip != self.fix_ip and ip not in self.wireless_ip:
                     LicenseView = QtWidgets.QWidget(self.centralWidget)
                     self.controller = LoginWidgetPanel.LoginWidgetPanel(LicenseView, self.centralWidget,
                                                                         self.MainWindow)

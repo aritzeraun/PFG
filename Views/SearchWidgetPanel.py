@@ -110,7 +110,6 @@ class SearchWidgetPanel(object):
 
         self.translateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
-        self.MainWindow.dockWidget.setEnabled(False)
         self.movie.start()
 
     def thread_search_correctly(self):
@@ -120,7 +119,13 @@ class SearchWidgetPanel(object):
             if e.errno != errno.EEXIST:
                 raise
 
-        for file in self.thread.filesName:
+        fileNames = []
+
+        for (dir_path, dir_names, filenames) in os.walk('./Downloads/'):
+            fileNames.extend(filenames)
+            break
+
+        for file in fileNames:
             oldDirectory = './Downloads/' + file
             newDirectory = self.searchDocumentListFolder + file
             os.replace(oldDirectory, newDirectory)

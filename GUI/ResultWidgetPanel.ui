@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>767</width>
+    <height>727</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>30</height>
+      </size>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="pushButton">
+        <property name="maximumSize">
+         <size>
+          <width>400</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+        </property>
+        <property name="text">
+         <string>Go to analize</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="8">
+       <widget class="QComboBox" name="comboBox_2">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="modelColumn">
+         <number>0</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>Author</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Title</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DOI</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Description</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="comboBox">
+        <property name="minimumSize">
+         <size>
+          <width>119</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"> QComboBox {
+border: 1px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	
+     padding: 1px 18px 1px 3px;
+     min-width: 6em;
+ }
+
+
+ QComboBox:on { /* shift the text when the popup opens */
+     padding-top: 3px;
+     padding-left: 4px;
+ }
+
+ QComboBox::drop-down {
+     subcontrol-origin: padding;
+     subcontrol-position: top right;
+     width: 15px;
+
+     border-left-width: 1px;
+     border-left-color: darkgray;
+     border-left-style: solid; /* just a single line */
+     border-top-right-radius: 3px; /* same radius as the QComboBox */
+     border-bottom-right-radius: 3px;
+ }
+
+ QComboBox::down-arrow {
+     image: url(descarga.png);
+ }
+
+ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+     top: 1px;
+     left: 1px;
+ }</string>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>All Documents</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>With DOI</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>No DOI</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+          <pointsize>9</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Time limit:  </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="4">
+       <widget class="QSpinBox" name="timeBox">
+        <property name="styleSheet">
+         <string notr="true">QSpinBox {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QSpinBox:hover {
+	background-color: rgb(95, 71, 10);
+}
+
+QSpinBox::down-arrow:pressed
+{
+border : 4px solid green;
+}</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="6">
+       <widget class="QPushButton" name="downloadButton">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+	border: 2px solid;
+ 	border-radius: 10px;
+	background-color: rgb(165, 134, 83);
+	padding-right: 20px;
+	padding-left: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(95, 71, 10);
+}</string>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="minimumSize">
+      <size>
+       <width>600</width>
+       <height>0</height>
+      </size>
+     </property>
+     <column>
+      <property name="text">
+       <string>Author</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Title</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>DOI</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="toolTip">
+       <string notr="true"/>
+      </property>
+      <property name="whatsThis">
+       <string notr="true"/>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeading|AlignBottom</set>
+      </property>
+      <property name="foreground">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../.designer/backup/checked.png</normaloff>../../../../.designer/backup/checked.png</iconset>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Downloaded</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

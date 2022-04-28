@@ -228,7 +228,7 @@ class LoginWidgetPanel(object):
         searchView.show()
         self.Form.close()
         self.MainWindow.visibleForm = searchView
-        self.MainWindow.dockWidget.setEnabled(True)
+        self.MainWindow.dockWidget.setEnabled(False)
 
     def thread_authentication_error(self):
         self.loadBox.clear()
