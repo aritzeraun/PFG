@@ -2,14 +2,14 @@ import configparser
 import urllib
 
 from PyQt5.QtCore import QThread, pyqtSignal
-from Connecttion import Connection
+from Connecttion import WebOfScience
 
 
 class LoginAction(QThread):
 
     authentication_error = pyqtSignal()
     authentication_success = pyqtSignal()
-    connection = Connection.Connections()
+    connection = WebOfScience.Connections()
     loginActionSuccess = False
 
     def __init__(self, username, password, userTypology):

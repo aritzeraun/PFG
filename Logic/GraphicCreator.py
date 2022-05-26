@@ -19,7 +19,7 @@ class GraphicCreatorAction(QThread):
         self.graphDirectory = graphDirectory
 
     def run(self):
-        call = "Rscript ./Graphics/circularGraphics.R " + str(self.directoryToDataFile) + " " + str(self.width)
+        call = "Rscript ./Graphics/GraphicsCreator.R " + str(self.directoryToDataFile) + " " + str(self.width)
         call = call + " " + str(self.height) + " " + str(self.support) + " " + str(self.confidence) + " "
         call = call + str(self.circularDirectory) + " " + str(self.graphDirectory)
 

@@ -7,7 +7,7 @@ from Views import NewProjectDialog
 from PyQt5 import QtCore, QtWidgets
 
 
-def renameProject(recentProjectsData, MainWindow, alertText, alertTextError):
+def renameProject(recentProjectsData, MainWindow):
 
     projectExist = False
 
@@ -22,21 +22,15 @@ def renameProject(recentProjectsData, MainWindow, alertText, alertTextError):
 
         if os.path.isdir(projectDirectory):
             projectExist = True
-            msgBoxLogin = QMessageBox()
-            msgBoxLogin.setText(str(alertText))
-            msgBoxLogin.exec()
-        else:
-            msgBoxLogin = QMessageBox()
-            msgBoxLogin.setText(str(alertTextError))
-            msgBoxLogin.exec()
 
         if projectExist:
 
             os.chdir(str(projectDirectory).replace(oldName, ''))
             os.rename(oldName, newProjectDialog.newProjectName)
             MainWindow.projectName = newProjectDialog.newProjectName
-            projectDirectory = str(projectDirectory).replace(str('/' + oldName), '')
-            controller = RecentProjectFileWriter.RecentProjectFileWriter()
             print(newProjectDialog.newProjectName)
             print(recentProjectsData)
-            controller.actualice(str(newProjectDialog.newProjectName))
+            try:
+                RecentProjectFileWriter.RecentProjectFileWriter().actualice(str(newProjectDialog.newProjectName))
+            except Exception as e:
+                print(e)

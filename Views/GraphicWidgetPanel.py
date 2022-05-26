@@ -118,8 +118,8 @@ class GraphicWidgetPanel(object):
         self.widthSpinBox.setProperty("value", 1000)
         self.widthSpinBox.setObjectName("widthSpinBox")
         self.gridLayoutTop.addWidget(self.widthSpinBox, 0, 5, 1, 1)
-        self.typeOfGraphicCombo.setMinimumSize(QtCore.QSize(130, 0))
-        self.typeOfGraphicCombo.setMaximumSize(QtCore.QSize(165, 16777215))
+        self.typeOfGraphicCombo.setMinimumSize(QtCore.QSize(185, 0))
+        self.typeOfGraphicCombo.setMaximumSize(QtCore.QSize(185, 16777215))
         font = QtGui.QFont()
         font.setFamily(self.font)
         font.setPointSize(int(self.fontSize))
@@ -264,6 +264,7 @@ class GraphicWidgetPanel(object):
         self.heightLabel.setEnabled(False)
         self.heightSpinBox.setEnabled(False)
         self.createGraphicButton.setEnabled(False)
+        self.MainWindow.menuBar.setEnabled(False)
 
     def thread_image_creation_correctly(self):
         self.graphicLabel.clear()
@@ -281,6 +282,7 @@ class GraphicWidgetPanel(object):
         self.confidenceLabel.setEnabled(True)
         self.confidenceSpinBox.setEnabled(True)
         self.SupportLabel.setEnabled(True)
+        self.MainWindow.menuBar.setEnabled(True)
 
         if 'ular' in self.typeOfGraphicCombo.currentText():
             pixmap_image = QtGui.QPixmap(self.circularImageName)
@@ -343,10 +345,10 @@ class GraphicWidgetPanel(object):
 
     def exportImageResult(self):
 
-        if 'ular ' in self.typeOfGraphicCombo.currentText():
-            source = self.graphImageName
-        else:
+        if 'ular' in self.typeOfGraphicCombo.currentText():
             source = self.circularImageName
+        else:
+            source = self.graphImageName
 
         if exists(self.GraphicsFolder) and exists(source):
 

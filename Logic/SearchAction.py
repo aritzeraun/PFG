@@ -2,7 +2,7 @@ import configparser
 import urllib
 
 from PyQt5.QtCore import QThread, pyqtSignal
-from Connecttion import Connection
+from Connecttion import WebOfScience
 
 
 class SearchAction(QThread):
@@ -27,7 +27,7 @@ class SearchAction(QThread):
         ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
 
         if ip == self.fix_ip or ip in self.wireless_ip:
-            self.connection = Connection.Connections()
+            self.connection = WebOfScience.Connections()
             self.connection.driverCreator()
 
         self.filesName = self.connection.dataSearch(self.searchText, self.searchError)

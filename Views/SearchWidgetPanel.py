@@ -107,10 +107,18 @@ class SearchWidgetPanel(object):
         self.processLabel.setMinimumHeight(100)
         self.searchButton.clicked.connect(lambda: self.search_data())
         self.searchLineEdit.returnPressed.connect(lambda: self.search_data())
+       # self.searchLineEdit.textChanged.connect(lambda: self.putButtonEnable())
 
         self.translateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
         self.movie.start()
+        #self.putButtonEnable()
+
+    def putButtonEnable(self):
+        if self.searchLineEdit.text().replace(' ', '') != '':
+            self.searchButton.setEnabled(False)
+        else:
+            self.searchButton.setEnabled(True)
 
     def thread_search_correctly(self):
         try:
@@ -132,6 +140,7 @@ class SearchWidgetPanel(object):
 
         time.sleep(1)
         self.MainWindow.dockWidget.setEnabled(True)
+        self.MainWindow.menuBar.setEnabled(True)
         self.MainWindow.controller.goToPanel(2)
 
     def thread_search_error(self):
@@ -152,6 +161,7 @@ class SearchWidgetPanel(object):
         self.searchButton.setEnabled(False)
         time.sleep(0.5)
         self.MainWindow.dockWidget.setEnabled(False)
+        self.MainWindow.menuBar.setEnabled(False)
 
     def search_data(self):
         loadView = threading.Thread(name="loadViewThread", target=self.loadViewThread)
@@ -167,6 +177,7 @@ class SearchWidgetPanel(object):
         self.config.read('./Languages/AppConfig' + self.configGeneral.get('SYSTEM', 'language_code') + '.cfg')
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.searchLineEdit.setPlaceholderText(_translate("Form", self.config.get('SearchViewSection',
-                                                                                  'search_topic_placeholder_text')))
+        self.searchLineEdit.setPlaceholderText(_translate("Form", str(self.config.get('SearchViewSection',
+                                                                                      'search_topic_placeholder_text'))
+                                                          .encode('ansi')))
         self.searchButton.setText(_translate("Form", self.config.get('SearchViewSection', 'search_button_text')))

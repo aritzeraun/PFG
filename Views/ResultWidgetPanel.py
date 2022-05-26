@@ -2,6 +2,7 @@ import configparser
 import errno
 import os
 import threading
+import time
 
 from os import walk
 from os.path import exists
@@ -391,6 +392,7 @@ class ResultWidgetPanel(object):
 
         # View Selected options
         self.viewOptionsComboBox.setCurrentIndex(1)
+        time.sleep(0.5)
 
         # Creates folder if not exists
         try:
@@ -406,7 +408,6 @@ class ResultWidgetPanel(object):
             for (dir_path, dir_names, filenames) in walk(self.downloadedFolder):
                 filesName.extend(filenames)
                 break
-
         loadView = threading.Thread(name="loadViewThread", target=self.GUIActionChanges)
         self.thread = DownloadDocuments.DownloadDocuments(self.dataToDownload, self.tableWidget, filesName,
                                                           int(self.limit_time_box.text()), self.downloadedFolder,
@@ -415,7 +416,13 @@ class ResultWidgetPanel(object):
         self.thread.downloaded_correctly.connect(lambda: self.downloadViewChanges())
 
         # If it is locate in changes provokes a error due to execute lines
+        # print("  ") se utilizan para la sincronización de los thread, sino dan errores
         self.tableWidget.setEnabled(False)
+        print("  ")
+        print("  ")
+        self.MainWindow.menuBar.setEnabled(False)
+        print("  ")
+        print("  ")
 
         loadView.start()
         self.thread.start()
@@ -428,6 +435,7 @@ class ResultWidgetPanel(object):
         self.MainWindow.dockWidget.setEnabled(True)
         self.GoToAnaliseWidget.setVisible(True)
         self.tableWidget.setEnabled(True)
+        self.MainWindow.menuBar.setEnabled(True)
 
     def GUIActionChanges(self):
         self.MainWindow.dockWidget.setEnabled(False)
@@ -458,8 +466,10 @@ class ResultWidgetPanel(object):
             self.tableWidget.removeRow(i)
 
         if self.searchTypology == 1 or self.searchTypology == 2:
+            print("  ")
             self.data = DocumentClasifycator.selectedDocuments(self.dataOfDocuments, self.searchTypology)
             if self.searchTypology == 1:
+                print(" ")
                 self.dataToDownload = self.data
         else:
             self.data = self.dataOfDocuments

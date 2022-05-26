@@ -33,7 +33,7 @@ class RecentProjectFileWriter:
         conf.close()
 
     def actualice(self, newName):
-        self.config_object.set('RECENT_PROJECT', 'project_name_1', str(newName))
+        self.config_object.set("RECENT_PROJECT", "project_name_1", str(newName))
 
         with open('./Configuration/RecentProjectData.cfg', 'w+') as conf:
             self.config_object.write(conf)

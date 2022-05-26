@@ -223,7 +223,6 @@ class ApplicationView:
         msgBoxLogin = QMessageBox()
         msgBoxLogin.setText(_translate("MainWindow", str(self.config.get('ApplicationViewSection',
                                                                          'messageBox_help_text')).encode('ansi')))
-        # msgBoxLogin.setAlignment(Qt.AlignJustify)
         msgBoxLogin.exec()
 
     def _showLicenseView(self):
@@ -312,10 +311,7 @@ class ApplicationView:
                                                              'messageBox_error_folder_change_text'))
 
     def _renameProject(self):
-        self._actualiseRecentProjects()
-        RenameProject.renameProject(self.recentProjectsData, self, "fff", "aa")
-
-        print(self.projectName)
+        RenameProject.renameProject(self.recentProjectsData, self)
         self.MainWindow.setWindowTitle(str(self.projectName))
 
     def _actualiseRecentProjects(self):

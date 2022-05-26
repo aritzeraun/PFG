@@ -2,7 +2,7 @@ import time
 
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Connecttion import scrihub
+from Connecttion import Sci_Hub
 from Logic import RenameDownloadedFiles, ExtractDataFromPDF
 
 
@@ -38,7 +38,7 @@ class DownloadDocuments(QThread):
                 # Verifies that the document does not been downloaded previously
                 if not documentName in self.filesName:
 
-                    self.sciHub_controller = scrihub.main(iterator.__getitem__(2), './Downloads', self.limit_time)
+                    self.sciHub_controller = Sci_Hub.main(iterator.__getitem__(2), './Downloads', self.limit_time)
 
                     if not 'err' in self.sciHub_controller:
                         RenameDownloadedFiles.RenameDownloadedFiles(iterator.__getitem__(2), './Downloads',
@@ -57,7 +57,7 @@ class DownloadDocuments(QThread):
 
                     item.setIcon(icon)
                     self.tableWidget.setItem(i, 1, item)
-
+        print(111)
         ExtractDataFromPDF.ExtractDataFromPDF(self.downloadedFolder, self.dataExtractFolder)
-
+        print(22)
         self.downloaded_correctly.emit()

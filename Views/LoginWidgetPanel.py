@@ -79,7 +79,7 @@ class LoginWidgetPanel(object):
         self.buttonWidget.setMinimumSize(QtCore.QSize(400, 40))
         self.buttonWidget.setMaximumSize(QtCore.QSize(400, 40))
         self.buttonWidget.setObjectName("widget_2")
-        self.accessButton.setGeometry(QtCore.QRect(130, 10, 111, 28))
+        self.accessButton.setGeometry(QtCore.QRect(130, 10, 130, 28))
         self.accessButton.setAutoFillBackground(False)
         self.accessButton.setStyleSheet("QPushButton {\n"
                                         "border: 2px solid;\n"
@@ -237,6 +237,7 @@ class LoginWidgetPanel(object):
         self.passwordField.setEnabled(True)
         self.accessButton.setEnabled(True)
         self.MainWindow.dockWidget.setEnabled(True)
+        self.MainWindow.menuBar.setEnabled(True)
 
         msgBoxLogin = QMessageBox()
         msgBoxLogin.setText(self.config.get('LoginWidgetPanelSection', 'messageBox_alert_loginError_text'))
@@ -252,6 +253,7 @@ class LoginWidgetPanel(object):
         self.accessButton.setEnabled(False)
         time.sleep(0.5)
         self.MainWindow.dockWidget.setEnabled(False)
+        self.MainWindow.menuBar.setEnabled(False)
 
     def accessButton_clicked_or_returnPressed(self):
         # takes values introduced

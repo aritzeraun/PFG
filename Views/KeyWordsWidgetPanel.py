@@ -263,8 +263,7 @@ class KeyWordsWidgetPanel(object):
 
     def initialStateDefined(self):
         if exists(self.keyExtractionFolder):
-            if exists(self.keyListFilePath) and exists(self.relationFilePath) and exists(self.uniqueKeysFilePath) and \
-                    exists(self.matrixAnalysisFile) and exists(self.finalDocumentPath):
+            if exists(self.keyListFilePath) and exists(self.relationFilePath) and exists(self.uniqueKeysFilePath):
                 self.findKeyWords(3)
             else:
                 if exists(self.keyListFilePath):
@@ -296,7 +295,10 @@ class KeyWordsWidgetPanel(object):
                                                                               int(self.colorOfItem[1]),
                                                                               int(self.colorOfItem[2])))
             else:
-                self.tableWidget.item(row, column).setBackground(QtGui.QColor(255, 255, 255))
+                if row % 2:
+                    self.tableWidget.item(row, column).setBackground(QtGui.QColor(85, 170, 255))
+                else:
+                    self.tableWidget.item(row, column).setBackground(QtGui.QColor(255, 255, 255))
 
     def addNewKey(self):
 
@@ -346,7 +348,7 @@ class KeyWordsWidgetPanel(object):
 
                                                                              int(self.colorOfItem[2])))
                 msgBoxLogin = QMessageBox()
-                msgBoxLogin.setText('error: at line ' + str(int(row + 1)) + ' of the table.')
+                msgBoxLogin.setText('Error: concepto vacio en la tabla. Linea: ' + str(int(row + 1)))
                 msgBoxLogin.exec()
                 break
 
@@ -357,7 +359,7 @@ class KeyWordsWidgetPanel(object):
 
             if exists(self.keyExtractionFolder):
                 if exists(self.keyListFilePath) and exists(self.relationFilePath) and exists(
-                        self.uniqueKeysFilePath) and exists(self.matrixAnalysisFile) and exists(self.finalDocumentPath):
+                        self.uniqueKeysFilePath):
                     dialog = QtWidgets.QDialog(self.centralWidget)
                     text_1 = str(self.config.get('KeyWordsViewSection', 'dialog_widget_message_text_1'))
                     text_2 = str(self.config.get('KeyWordsViewSection', 'dialog_widget_message_text_2'))
@@ -384,6 +386,7 @@ class KeyWordsWidgetPanel(object):
                                                                 self.min_phrase_freq_adj_SpinBox.value(),
                                                                 self.min_keyword_frequency_SpinBox.value())
                 self.thread.successful_Action.connect(lambda: self.allCorrect())
+                self.tableWidget.setEnabled(False)
                 loadView.start()
                 self.thread.start()
 
@@ -399,6 +402,8 @@ class KeyWordsWidgetPanel(object):
         self.min_char_length_label.setEnabled(True)
         self.min_char_length_SpinBox.setEnabled(True)
         self.MainWindow.dockWidget.setEnabled(True)
+        self.tableWidget.setEnabled(True)
+        self.MainWindow.menuBar.setEnabled(True)
         self.gifChargingLabel.clear()
 
     def findKeyWords(self, typology):
@@ -454,6 +459,7 @@ class KeyWordsWidgetPanel(object):
         self.min_keyword_frequency_SpinBox.setEnabled(False)
         self.min_char_length_label.setEnabled(False)
         self.min_char_length_SpinBox.setEnabled(False)
+        self.MainWindow.menuBar.setEnabled(False)
         self.createGraphicsButton.setEnabled(False)
         self.translateUi()
 
@@ -542,8 +548,8 @@ class KeyWordsWidgetPanel(object):
                                                                      'minimum_phrase_frequency_adj_label_text'))
                                                           .encode('ansi')))
         self.min_keyword_frequency_label.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
-                                                                   'minimum_keyword_frequency_label_text'))
+                                                                               'minimum_keyword_frequency_label_text'))
                                                             .encode('ansi')))
         self.min_char_length_label.setText(_translate("Form", str(self.config.get('KeyWordsViewSection',
-                                                               'minimum_keyword_length_label_text'))
+                                                                                  'minimum_keyword_length_label_text'))
                                            .encode('ansi')))
